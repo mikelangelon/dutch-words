@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/a-h/templ"
 	"log/slog"
 	"net/http"
 )
@@ -13,10 +14,10 @@ func main() {
 	handler := NewHandler(service)
 	mux := http.NewServeMux()
 
+	component := headerTemplate("World")
+
 	// Routing
-	mux.HandleFunc("GET localhost/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "Hello world")
-	})
+	mux.Handle("GET localhost/", templ.Handler(component))
 	mux.HandleFunc("GET localhost/word/{id}/", handler.getWord)
 	mux.HandleFunc("GET localhost/word/dutch/{text}/", handler.getWorByDutch)
 	mux.HandleFunc("GET localhost/word/", handler.getWords)
