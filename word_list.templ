@@ -1,0 +1,10 @@
+package main
+
+templ WordList(words []Word) {
+	<div id="word">
+		for _, q := range words {
+			@WordCard(q)
+			<br/>
+		}
+	</div>
+}

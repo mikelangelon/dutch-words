@@ -1,0 +1,19 @@
+package main
+
+templ Dashboard(words []Word) {
+<html>
+		<head>
+			<title>Words</title>
+			<meta charset="utf-8"/>
+			<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+			<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"/>
+			<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
+			<style>body        { padding-top:90px; }</style>
+		</head>
+		<body>
+            @WordForm()
+            @WordList(words)
+		</body>
+	</html>
+
+}

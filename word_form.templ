@@ -1,0 +1,14 @@
+package main
+
+templ WordForm() {
+	<form id="word" hx-post="/web/word" hx-target="#response-div">
+		<span>
+			<label for="name">Word: </label> <br />
+			<input name="dutch" placeholder="Dutch" type="text"/>
+			<input name="english" placeholder="English" type="text"/>
+		</span>
+		<button type="submit" hx-confirm="Submit">Create Word</button>
+		<div id="response-div"></div>
+	</form>
+}
+

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -16,20 +17,14 @@ func NewHandler(service Service) *handler {
 }
 
 func (s *handler) createWord(w http.ResponseWriter, req *http.Request) {
-	type RequestWord struct {
-		Word    string   `json:"word"`
-		English string   `json:"english"`
-		Tags    []string `json:"tags"`
-	}
+	enableCors(&w)
+	dutch := req.FormValue("dutch")
+	english := req.FormValue("english")
+
 	type ResponseID struct {
 		ID string `json:"id"`
 	}
-	dec := json.NewDecoder(req.Body)
-	var rw RequestWord
-	if err := dec.Decode(&rw); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+	fmt.Println(fmt.Sprintf("%s %s", dutch, english))
 	renderJSON(w, ResponseID{ID: "1"})
 }
 
