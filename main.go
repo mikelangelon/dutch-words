@@ -31,7 +31,7 @@ func main() {
 	mux.HandleFunc("POST /web/word", handler.createWord)
 	mux.HandleFunc("DELETE /web/word/{id}/", handler.deleteWord)
 
-	server := &http.Server{Addr: ":8080", Handler: mux}
+	server := &http.Server{Addr: "localhost:8080", Handler: mux}
 
 	fmt.Println("Server is listening on http://localhost:8080")
 	err := server.ListenAndServe()
