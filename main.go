@@ -24,6 +24,8 @@ func enableCors(w *http.ResponseWriter) {
 func main() {
 	// Setup
 	store := NewStore()
+	store.Insert(Word{Dutch: "hond", English: "dog"})
+	store.Insert(Word{Dutch: "paard", English: "horse"})
 	service := NewService(store)
 	handler := NewHandler(service)
 	mux := http.NewServeMux()
@@ -31,9 +33,12 @@ func main() {
 	// Routing
 	mux.HandleFunc("GET /web/", func(w http.ResponseWriter, request *http.Request) {
 		enableCors(&w)
-		Dashboard([]Word{
-			{ID: "1", Dutch: "hond", English: "dog"},
-		}).Render(request.Context(), w)
+		words, _ := store.FindAll()
+		var ws []Word
+		for _, v := range words {
+			ws = append(ws, *v)
+		}
+		Dashboard(ws).Render(request.Context(), w)
 	})
 	mux.HandleFunc("GET /web/word/{id}", handler.getWord)
 	mux.HandleFunc("GET /web/word/dutch/{text}/", handler.getWorByDutch)

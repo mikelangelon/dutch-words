@@ -4,8 +4,8 @@ templ WordCard(word Word) {
 <div class="card">
     <div class="card-header">
         { word.ID}
-         <button hx-delete={"/web/word/" + word.ID } class="btn btn-primary">
-            Click To Delete
+         <button hx-delete={"/web/word/" + word.ID } class="btn btn-primary" hx-target="#words">
+           Delete
          </button>
     </div>
     <div class="card-body">

@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
@@ -21,11 +20,16 @@ func (s *handler) createWord(w http.ResponseWriter, req *http.Request) {
 	dutch := req.FormValue("dutch")
 	english := req.FormValue("english")
 
-	type ResponseID struct {
-		ID string `json:"id"`
+	s.Service.InsertWord(Word{Dutch: dutch, English: english})
+	words, err := s.Service.FindAllWords()
+	if err != nil {
+		// TODO Deal with error
 	}
-	fmt.Println(fmt.Sprintf("%s %s", dutch, english))
-	renderJSON(w, ResponseID{ID: "1"})
+	var ws []Word
+	for _, v := range words {
+		ws = append(ws, *v)
+	}
+	WordList(ws).Render(req.Context(), w)
 }
 
 func (s *handler) deleteWord(w http.ResponseWriter, req *http.Request) {
@@ -35,6 +39,12 @@ func (s *handler) deleteWord(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	words, _ := s.Service.FindAllWords()
+	var ws []Word
+	for _, v := range words {
+		ws = append(ws, *v)
+	}
+	WordList(ws).Render(req.Context(), w)
 }
 
 func (s *handler) getWord(w http.ResponseWriter, req *http.Request) {

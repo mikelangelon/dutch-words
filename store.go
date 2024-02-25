@@ -1,6 +1,10 @@
 package main
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+	"time"
+)
 
 var errNotFound = errors.New("not found")
 
@@ -14,6 +18,7 @@ func NewStore() store {
 	}
 }
 func (s store) Insert(word Word) error {
+	word.ID = s.generateID()
 	s.memoryDB[word.ID] = word
 	return nil
 }
@@ -40,9 +45,13 @@ func (s store) FindByDutch(dutch string) (*Word, error) {
 }
 
 func (s store) FindAll() ([]*Word, error) {
-	var words = make([]*Word, len(s.memoryDB))
+	var words = make([]*Word, 0, len(s.memoryDB))
 	for _, v := range s.memoryDB {
 		words = append(words, &v)
 	}
 	return words, nil
+}
+
+func (s store) generateID() string {
+	return fmt.Sprintf("%d", time.Now().UnixMicro())
 }
