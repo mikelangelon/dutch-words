@@ -1,4 +1,4 @@
-package main
+package components
 
 templ navBar() {
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary my-3 px-2">
@@ -8,7 +8,7 @@ templ navBar() {
 <div class="collapse navbar-collapse" id="navbarNavDropdown">
   <ul class="navbar-nav" id="navbar">
     <li class="nav-item">
-      <a class="nav-link" hx-get="/web/tab1" hx-swap="innerHTML" hx-trigger="click,load" hx-target="#content" >Home <span class="sr-only">(current)</span></a>
+      <a class="nav-link active" hx-get="/web/tab1" hx-swap="innerHTML" hx-trigger="click,load" hx-target="#content" >Home <span class="sr-only">(current)</span></a>
     </li>
     <li class="nav-item">
       <a class="nav-link" hx-get="/web/tab2" hx-swap="innerHTML" hx-target="#content">Search</a>

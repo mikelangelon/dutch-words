@@ -1,8 +1,9 @@
-package main
+package components
 
 import "fmt"
+import "github.com/mikelangelon/dutch-words/core"
 
-templ WordCard(word Word) {
+templ WordCard(word core.Word) {
 <div class="card">
     <div class="card-header">
          <button hx-delete={"/web/word/" + word.ID } class="btn btn-danger" hx-target="#words">

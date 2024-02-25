@@ -1,0 +1,11 @@
+package components
+
+import "github.com/mikelangelon/dutch-words/core"
+
+templ WordList(words []core.Word) {
+	<div id="words">
+		for _, q := range words {
+			@WordCard(q)
+		}
+	</div>
+}
