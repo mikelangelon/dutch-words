@@ -1,21 +1,31 @@
 package main
 
+import "fmt"
+
 templ WordCard(word Word) {
 <div class="card">
     <div class="card-header">
         { word.ID}
-         <button hx-delete={"/web/word/" + word.ID } class="btn btn-primary" hx-target="#words">
+         <button hx-delete={"/web/word/" + word.ID } class="btn btn-danger" hx-target="#words">
            Delete
          </button>
     </div>
     <div class="card-body">
         <div class="row">
-            <div class="col-2">Dutch</div>
-            <div class="col-10">{ word.Dutch}</div>
+            <div class="col-1">Dutch</div>
+            <div class="col-2">{ word.Dutch}</div>
         </div>
         <div class="row">
-            <div class="col-2">English</div>
-            <div class="col-10">{ word.English}</div>
+            <div class="col-1">English</div>
+            <div class="col-2">{ word.English}</div>
+        </div>
+         <div class="row">
+            <div class="col-1">Type</div>
+            <div class="col-2">{ word.Type}</div>
+        </div>
+        <div class="row">
+            <div class="col-1">Tags</div>
+            <div class="col-2">{ fmt.Sprintf("%v", word.Tags)}</div>
         </div>
     </div>
 </div>

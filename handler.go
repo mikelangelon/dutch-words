@@ -15,12 +15,34 @@ func NewHandler(service Service) *handler {
 	}
 }
 
+func (s *handler) formAndList(w http.ResponseWriter, request *http.Request) {
+	enableCors(&w)
+	words, _ := s.Service.FindAllWords()
+	var ws []Word
+	for _, v := range words {
+		ws = append(ws, *v)
+	}
+	Dashboard(ws).Render(request.Context(), w)
+}
+
+func (s *handler) tab1(w http.ResponseWriter, request *http.Request) {
+	enableCors(&w)
+	words, _ := s.Service.FindAllWords()
+	var ws []Word
+	for _, v := range words {
+		ws = append(ws, *v)
+	}
+	Tabs(ws).Render(request.Context(), w)
+}
+
 func (s *handler) createWord(w http.ResponseWriter, req *http.Request) {
 	enableCors(&w)
 	dutch := req.FormValue("dutch")
 	english := req.FormValue("english")
+	tags := req.Form["tags"]
+	wordType := req.FormValue("type")
 
-	s.Service.InsertWord(Word{Dutch: dutch, English: english})
+	s.Service.InsertWord(Word{Dutch: dutch, English: english, Tags: tags, Type: wordType})
 	words, err := s.Service.FindAllWords()
 	if err != nil {
 		// TODO Deal with error

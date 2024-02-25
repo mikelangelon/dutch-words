@@ -4,19 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"time"
 )
-
-type TimeValue struct {
-	Time  string  `json:"time"`
-	Value float64 `json:"value"`
-}
-
-type Post struct {
-	Date    time.Time
-	Title   string
-	Content string
-}
 
 func enableCors(w *http.ResponseWriter) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
@@ -31,14 +19,11 @@ func main() {
 	mux := http.NewServeMux()
 
 	// Routing
-	mux.HandleFunc("GET /web/", func(w http.ResponseWriter, request *http.Request) {
-		enableCors(&w)
-		words, _ := store.FindAll()
-		var ws []Word
-		for _, v := range words {
-			ws = append(ws, *v)
-		}
-		Dashboard(ws).Render(request.Context(), w)
+	mux.HandleFunc("GET /", handler.formAndList)
+	mux.HandleFunc("GET /web/", handler.formAndList)
+	mux.HandleFunc("GET /web/tab1", handler.tab1)
+	mux.HandleFunc("GET /web/tab2", func(w http.ResponseWriter, request *http.Request) {
+		Tabs([]Word{}).Render(request.Context(), w)
 	})
 	mux.HandleFunc("GET /web/word/{id}", handler.getWord)
 	mux.HandleFunc("GET /web/word/dutch/{text}/", handler.getWorByDutch)
@@ -52,21 +37,5 @@ func main() {
 	err := server.ListenAndServe()
 	if err != nil {
 		slog.Error("unexpected error on server", "error", err)
-	}
-}
-
-func CORS(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Access-Control-Allow-Origin", "*")
-		w.Header().Add("Access-Control-Allow-Credentials", "true")
-		w.Header().Add("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-		w.Header().Add("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-
-		if r.Method == "OPTIONS" {
-			http.Error(w, "No Content", http.StatusNoContent)
-			return
-		}
-
-		next(w, r)
 	}
 }
