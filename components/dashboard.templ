@@ -1,8 +1,6 @@
 package components
 
-import "github.com/mikelangelon/dutch-words/core"
-
-templ Dashboard(words []core.Word) {
+templ Dashboard(navBar templ.Component, content templ.Component) {
 <html>
 		<head>
 			<title>Words</title>
@@ -13,8 +11,8 @@ templ Dashboard(words []core.Word) {
 			<style>body        { padding-top:90px; padding-left:90px; padding-right:50px; }</style>
 		</head>
 		<body>
-           @navBar()
-          <div id="content" class="my-2"></div>
+           @navBar
+           @content
 		</body>
 	</html>
 

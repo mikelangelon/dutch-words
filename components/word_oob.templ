@@ -3,7 +3,7 @@ package components
 import "github.com/mikelangelon/dutch-words/core"
 
 templ WordExtra(word core.Word) {
-    <div id="words" hx-swap-oob="beforebegin">
+    <div id="words" hx-swap-oob="afterbegin">
         @WordCard(word)
     </div>
 }

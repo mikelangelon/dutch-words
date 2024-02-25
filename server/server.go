@@ -15,10 +15,12 @@ func New(service services.Service) *http.Server {
 	mux.HandleFunc("GET /web/", handler.formAndList)
 	mux.HandleFunc("GET /web/tab1", handler.tab1)
 	mux.HandleFunc("GET /web/tab2", func(w http.ResponseWriter, request *http.Request) {
-		components.WordSearch().Render(request.Context(), w)
+		navBar := components.NavBar(nav("Search"))
+		components.Dashboard(navBar, components.WordSearch()).Render(request.Context(), w)
 	})
 	mux.HandleFunc("GET /web/tab3", func(w http.ResponseWriter, request *http.Request) {
-		components.Tags([]string{"tag1", "tag2", "tag3"}).Render(request.Context(), w)
+		navBar := components.NavBar(nav("Tags"))
+		components.Dashboard(navBar, components.Tags([]string{"tag1", "tag2", "tag3"})).Render(request.Context(), w)
 	})
 	mux.HandleFunc("GET /web/word/{id}", handler.getWord)
 	mux.HandleFunc("GET /web/word/dutch/{text}/", handler.getWorByDutch)

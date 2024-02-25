@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/mikelangelon/dutch-words/components"
 	"github.com/mikelangelon/dutch-words/core"
 	"github.com/mikelangelon/dutch-words/services"
@@ -21,23 +20,50 @@ func newHandler(service services.Service) *handler {
 
 func (s *handler) formAndList(w http.ResponseWriter, request *http.Request) {
 	enableCors(&w)
+	navBar := components.NavBar(nav("Home"))
 	words, _ := s.Service.FindAllWords()
 	var ws []core.Word
 	for _, v := range words {
 		ws = append(ws, *v)
 	}
-	components.Dashboard(ws).Render(request.Context(), w)
+	tab1 := components.Tabs(core.NewFormData(), ws)
+	components.Dashboard(navBar, tab1).Render(request.Context(), w)
 }
 
+func nav(current string) core.NavigationItems {
+	items := core.NavigationItems{
+		{
+			Label:  "Home",
+			Link:   "/web/tab1",
+			Active: false,
+		},
+		{
+			Label:  "Search",
+			Link:   "/web/tab2",
+			Active: false,
+		},
+		{
+			Label:  "Tags",
+			Link:   "/web/tab3",
+			Active: false,
+		},
+	}
+	for _, v := range items {
+		if v.Label == current {
+			v.Active = true
+		}
+	}
+	return items
+}
 func (s *handler) tab1(w http.ResponseWriter, request *http.Request) {
-	fmt.Println("tab1")
 	enableCors(&w)
 	words, _ := s.Service.FindAllWords()
 	var ws []core.Word
 	for _, v := range words {
 		ws = append(ws, *v)
 	}
-	components.Tabs(core.NewFormData(), ws).Render(request.Context(), w)
+	navBar := components.NavBar(nav("Home"))
+	components.Dashboard(navBar, components.Tabs(core.NewFormData(), ws)).Render(request.Context(), w)
 }
 
 func (s *handler) createWord(w http.ResponseWriter, req *http.Request) {
