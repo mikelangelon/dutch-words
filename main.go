@@ -23,7 +23,7 @@ func main() {
 	mux.HandleFunc("GET /web/", handler.formAndList)
 	mux.HandleFunc("GET /web/tab1", handler.tab1)
 	mux.HandleFunc("GET /web/tab2", func(w http.ResponseWriter, request *http.Request) {
-		Tabs([]Word{}).Render(request.Context(), w)
+		WordSearch().Render(request.Context(), w)
 	})
 	mux.HandleFunc("GET /web/word/{id}", handler.getWord)
 	mux.HandleFunc("GET /web/word/dutch/{text}/", handler.getWorByDutch)

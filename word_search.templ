@@ -1,0 +1,11 @@
+package main
+
+templ WordSearch() {
+	<form id="search" hx-get="/web/word" hx-target="#search-results">
+        <label for="word">Word</label>
+        <div class="form-group">
+            <input name="word" />
+        </div>
+   </form>
+   <div id="search-results"></div>
+}

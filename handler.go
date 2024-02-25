@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -26,6 +27,7 @@ func (s *handler) formAndList(w http.ResponseWriter, request *http.Request) {
 }
 
 func (s *handler) tab1(w http.ResponseWriter, request *http.Request) {
+	fmt.Println("tab1")
 	enableCors(&w)
 	words, _ := s.Service.FindAllWords()
 	var ws []Word
@@ -90,13 +92,14 @@ func (s *handler) getWorByDutch(w http.ResponseWriter, req *http.Request) {
 }
 
 func (s *handler) getWords(w http.ResponseWriter, req *http.Request) {
-	words, err := s.Service.FindAllWords()
+	search := req.FormValue("word")
+	word, err := s.Service.FindWordByDutch(search)
 	if err != nil {
 		// TODO To improve error codes
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	renderJSON(w, words)
+	WordList([]Word{*word}).Render(req.Context(), w)
 }
 func renderJSON(w http.ResponseWriter, v interface{}) {
 	js, err := json.Marshal(v)

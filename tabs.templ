@@ -1,16 +1,6 @@
 package main
 
 templ Tabs(words []Word) {
-<div id="tabs">
-            <ul class="nav nav-tabs">
-              <li class="nav-item">
-                <a class="nav-link active" hx-get="/web/tab1" hx-swap="innerHTML" hx-target="#tabs" aria-current="page" href="#">Active</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" hx-get="/web/tab2" hx-swap="innerHTML" hx-target="#tabs">Link</a>
-              </li>
-            </ul>
-                @WordForm()
-                @WordList(words)
- </div>
-           }
+    @WordForm()
+    @WordList(words)
+}
