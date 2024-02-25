@@ -11,21 +11,7 @@ templ Dashboard(words []Word) {
 			<style>body        { padding-top:90px; padding-left:90px; padding-right:50px; }</style>
 		</head>
 		<body>
-		  <nav class="navbar navbar-expand-lg navbar-dark bg-primary my-3 px-2">
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNavDropdown">
-              <ul class="navbar-nav">
-                <li class="nav-item">
-                  <a class="nav-link" hx-get="/web/tab1" hx-swap="innerHTML" hx-trigger="click,load" hx-target="#content" >Home <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" hx-get="/web/tab2" hx-swap="innerHTML" hx-target="#content">Search</a>
-                </li>
-              </ul>
-            </div>
-          </nav>
+           @navBar()
           <div id="content" class="my-2"></div>
 		</body>
 	</html>

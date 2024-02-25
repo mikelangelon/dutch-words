@@ -1,0 +1,9 @@
+package main
+
+templ Tags(tags []string) {
+<ul>
+    for _, t := range tags {
+        <li><a href="#" hx-get={"/web/tags/" + t } >{ t }</a></li>
+    }
+</ul>
+}
