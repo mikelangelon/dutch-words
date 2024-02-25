@@ -13,7 +13,7 @@ func main() {
 	// Setup
 	store := db.NewStore()
 	store.Insert(&core.Word{Dutch: "hond", English: "dog"})
-	store.Insert(&core.Word{Dutch: "paard", English: "horse"})
+	store.Insert(&core.Word{Dutch: "paard", English: "horse", Tags: []string{"tag1"}})
 	sv := server.New(services.NewService(store))
 
 	fmt.Println("Server is listening on http://localhost:8080")

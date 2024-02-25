@@ -31,3 +31,7 @@ func (s Service) FindWordByDutch(dutch string) (*core.Word, error) {
 func (s Service) FindAllWords() ([]*core.Word, error) {
 	return s.store.FindAll()
 }
+
+func (s Service) FindWordsBy(search core.Search) ([]*core.Word, error) {
+	return s.store.FindBy(search)
+}

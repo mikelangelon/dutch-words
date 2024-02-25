@@ -18,6 +18,22 @@ func newHandler(service services.Service) *handler {
 	}
 }
 
+func (s *handler) tags(w http.ResponseWriter, request *http.Request) {
+	tag := request.PathValue("tag")
+	search := core.Search{
+		Tag: &tag,
+	}
+	words, err := s.Service.FindWordsBy(search)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	var ws []core.Word
+	for _, v := range words {
+		ws = append(ws, *v)
+	}
+	components.WordList(ws).Render(request.Context(), w)
+}
 func (s *handler) formAndList(w http.ResponseWriter, request *http.Request) {
 	enableCors(&w)
 	navBar := components.NavBar(nav("Home"))

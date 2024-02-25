@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/mikelangelon/dutch-words/core"
+	"slices"
 	"time"
 )
 
@@ -53,6 +54,25 @@ func (s Store) FindAll() ([]*core.Word, error) {
 	return words, nil
 }
 
+func (s Store) FindBy(search core.Search) ([]*core.Word, error) {
+	var words = make([]*core.Word, 0, len(s.memoryDB))
+	for _, word := range s.memoryDB {
+		if search.Tag != nil && !slices.Contains(word.Tags, *search.Tag) {
+			continue
+		}
+		if search.DutchWord != nil && word.Dutch != *search.DutchWord {
+			continue
+		}
+		if search.EnglishWord != nil && word.English != *search.EnglishWord {
+			continue
+		}
+		if search.ID != nil && word.ID != *search.ID {
+			continue
+		}
+		words = append(words, &word)
+	}
+	return words, nil
+}
 func (s Store) generateID() string {
 	return fmt.Sprintf("%d", time.Now().UnixMicro())
 }

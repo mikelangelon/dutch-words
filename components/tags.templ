@@ -3,7 +3,8 @@ package components
 templ Tags(tags []string) {
 <ul>
     for _, t := range tags {
-        <li><a href="#" hx-get={"/web/tags/" + t } >{ t }</a></li>
+        <li><a href="#" hx-get={"/web/tags/" + t } hx-target="#search-results" >{ t }</a></li>
     }
 </ul>
+<div id="search-results"></div>
 }
