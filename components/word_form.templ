@@ -1,8 +1,10 @@
 package components
 
-templ WordForm() {
-<div class="container-fluid bg-secondary d-grid gap-3">
-    <form id="word" hx-post="/web/word" hx-target="#words">
+import "github.com/mikelangelon/dutch-words/core"
+
+templ WordForm(data core.FormData) {
+<div id="container-form" class="container-fluid bg-secondary d-grid gap-3">
+    <form id="form" hx-post="/web/word" hx-target="#container-form" hx-swap="outerHTML">
             <label for="word">Word</label>
             <div class="form-group">
                 <input name="dutch" type="text" class="form-control" id="dutch" aria-describedby="dutch" placeholder="Dutch" />
@@ -32,8 +34,27 @@ templ WordForm() {
                </select>
             </div>
             <button type="submit" hx-confirm="Submit" class="btn btn-primary">Create Word</button>
+            if len(data.Errors) > 0 {
+                <div class="alert alert-danger" role="alert">
+                  Error!
+                </div>
+            }
         </form>
 </div>
-
+<script>
+document.addEventListener("DOMContentLoaded", (event) => {
+    document.body.addEventListener('htmx:beforeSwap', function(evt) {
+        if (evt.detail.xhr.status === 422) {
+            // allow 422 responses to swap as we are using this as a signal that
+            // a form was submitted with bad data and want to rerender with the
+            // errors
+            //
+            // set isError to false to avoid error logging in console
+            evt.detail.shouldSwap = true;
+            evt.detail.isError = false;
+        }
+    });
+})
+</script>
 }
 

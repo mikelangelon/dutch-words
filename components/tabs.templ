@@ -2,8 +2,8 @@ package components
 
 import "github.com/mikelangelon/dutch-words/core"
 
-templ Tabs(words []core.Word) {
-    @WordForm()
+templ Tabs(data core.FormData, words []core.Word) {
+    @WordForm(data)
     <div class="py-2">
         @WordList(words)
     </div>

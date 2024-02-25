@@ -18,9 +18,9 @@ func NewStore() Store {
 		memoryDB: map[string]core.Word{},
 	}
 }
-func (s Store) Insert(word core.Word) error {
+func (s Store) Insert(word *core.Word) error {
 	word.ID = s.generateID()
-	s.memoryDB[word.ID] = word
+	s.memoryDB[word.ID] = *word
 	return nil
 }
 

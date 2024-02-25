@@ -13,7 +13,7 @@ type handler struct {
 	Service services.Service
 }
 
-func NewHandler(service services.Service) *handler {
+func newHandler(service services.Service) *handler {
 	return &handler{
 		Service: service,
 	}
@@ -37,7 +37,7 @@ func (s *handler) tab1(w http.ResponseWriter, request *http.Request) {
 	for _, v := range words {
 		ws = append(ws, *v)
 	}
-	components.Tabs(ws).Render(request.Context(), w)
+	components.Tabs(core.NewFormData(), ws).Render(request.Context(), w)
 }
 
 func (s *handler) createWord(w http.ResponseWriter, req *http.Request) {
@@ -47,7 +47,16 @@ func (s *handler) createWord(w http.ResponseWriter, req *http.Request) {
 	tags := req.Form["tags"]
 	wordType := req.FormValue("type")
 
-	s.Service.InsertWord(core.Word{Dutch: dutch, English: english, Tags: tags, Type: wordType})
+	if dutch == "hond" {
+		data := core.NewFormData()
+		data.Errors["word"] = "something crazy"
+		components.WordForm(data).Render(req.Context(), w)
+		http.Error(w, "duplicated", http.StatusUnprocessableEntity)
+		return
+	}
+	word := &core.Word{Dutch: dutch, English: english, Tags: tags, Type: wordType}
+	err := s.Service.InsertWord(word)
+
 	words, err := s.Service.FindAllWords()
 	if err != nil {
 		// TODO Deal with error
@@ -56,22 +65,18 @@ func (s *handler) createWord(w http.ResponseWriter, req *http.Request) {
 	for _, v := range words {
 		ws = append(ws, *v)
 	}
-	components.WordList(ws).Render(req.Context(), w)
+	components.WordForm(core.NewFormData()).Render(req.Context(), w)
+	components.WordExtra(*word).Render(req.Context(), w)
 }
 
 func (s *handler) deleteWord(w http.ResponseWriter, req *http.Request) {
+	enableCors(&w)
 	err := s.Service.DeleteWord(req.PathValue("id"))
 	if err != nil {
 		// TODO To improve error codes
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	words, _ := s.Service.FindAllWords()
-	var ws []core.Word
-	for _, v := range words {
-		ws = append(ws, *v)
-	}
-	components.WordList(ws).Render(req.Context(), w)
 }
 
 func (s *handler) getWord(w http.ResponseWriter, req *http.Request) {

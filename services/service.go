@@ -13,7 +13,7 @@ func NewService(store db.Store) Service {
 	return Service{store: store}
 }
 
-func (s Service) InsertWord(word core.Word) error {
+func (s Service) InsertWord(word *core.Word) error {
 	return s.store.Insert(word)
 }
 
