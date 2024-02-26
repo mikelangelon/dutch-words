@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/mikelangelon/dutch-words/core"
+	"github.com/mikelangelon/dutch-words/config"
 	"github.com/mikelangelon/dutch-words/db"
 	"github.com/mikelangelon/dutch-words/server"
 	"github.com/mikelangelon/dutch-words/services"
@@ -10,15 +10,30 @@ import (
 )
 
 func main() {
-	// Setup
+	// Parse config
+	cfg, err := config.Parse()
+	if err != nil {
+		slog.Error("problem parsing dependencies", "error", err)
+	}
+	// Setup dependencies
+	mongoStore, err := db.NewMongoStore(cfg)
+	if err != nil {
+		slog.Error("problem parsing dependencies", "error", err)
+	}
+	words, err := mongoStore.SearchWords()
+	if err != nil {
+		slog.Error("problem parsing dependencies", "error", err)
+	}
 	store := db.NewStore()
-	store.Insert(&core.Word{Dutch: "hond", English: "dog"})
-	store.Insert(&core.Word{Dutch: "paard", English: "horse", Tags: []string{"tag1"}})
+	for _, v := range words {
+		store.Insert(v)
+	}
+
 	sv := server.New(services.NewService(store))
 
 	fmt.Println("Server is listening on http://localhost:8080")
 
-	err := sv.ListenAndServe()
+	err = sv.ListenAndServe()
 	if err != nil {
 		slog.Error("unexpected error on server", "error", err)
 	}
