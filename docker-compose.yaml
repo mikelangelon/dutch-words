@@ -1,0 +1,13 @@
+---
+version: '3'
+services:
+  db:
+    container_name: 'mongo'
+    image: mongo:4.0.20
+    ports:
+      - '27017:27017'
+    volumes:
+      - './:/words'
+    working_dir: /cdn
+    command: ['bash', '-c', 'mongod --bind_ip_all']
+

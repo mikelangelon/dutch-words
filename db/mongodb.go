@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/mikelangelon/dutch-words/config"
 	"github.com/mikelangelon/dutch-words/core"
 	"go.mongodb.org/mongo-driver/bson"
@@ -31,12 +32,71 @@ type Word struct {
 	Tags       []string `bson:"tags,omitempty" json:"tags"`
 }
 
-func (m MongoStore) SearchWords() ([]*core.Word, error) {
-	options := options.Find()
-	options.SetLimit(10)
-	c, err := m.client.Database("dutch").Collection("words").Find(context.TODO(), bson.D{}, options)
+func (m MongoStore) FindByID(id string) (*core.Word, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m MongoStore) FindByDutch(dutch string) (*core.Word, error) {
+	filter := bson.M{
+		"$or": []bson.M{
+			{
+				"dutch": dutch,
+			},
+		},
+	}
+	s := m.client.Database("dutch").Collection("words").FindOne(context.TODO(), filter)
+	if s.Err() != nil {
+		if s.Err() == mongo.ErrNoDocuments {
+			return nil, errors.New("not found")
+		}
+		return nil, s.Err()
+	}
+	var w core.Word
+	if err := s.Decode(&w); err != nil {
+		return nil, err
+	}
+	return &w, nil
+}
+
+func (m MongoStore) FindAll() ([]*core.Word, error) {
+	return m.searchWords(nil)
+}
+
+func (m MongoStore) FindBy(search core.Search) ([]*core.Word, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m MongoStore) Delete(id string) error {
+	filter := bson.M{
+		"id": id,
+	}
+	_, err := m.dutchCollection().DeleteOne(context.TODO(), filter)
 	if err != nil {
-		return nil, errors.New("crash")
+		return fmt.Errorf("problem deleting task: %w", err)
+	}
+	return nil
+}
+
+func (m MongoStore) Insert(word *core.Word) error {
+	ctx := context.TODO()
+	if _, err := m.dutchCollection().InsertOne(ctx, word); err != nil {
+		return fmt.Errorf("problem inserting word: %w", err)
+	}
+	return nil
+}
+
+func (m MongoStore) searchWords(limit *int64) ([]*core.Word, error) {
+
+	var opts *options.FindOptions
+	if limit != nil {
+		opts = options.Find()
+		opts.SetLimit(*limit)
+	}
+	c, err := m.dutchCollection().Find(context.TODO(), bson.D{}, opts)
+	if err != nil {
+		return nil, fmt.Errorf("problem searching words: %w", err)
 	}
 	var words []*core.Word
 	for c.Next(context.TODO()) {
@@ -52,6 +112,10 @@ func (m MongoStore) SearchWords() ([]*core.Word, error) {
 		})
 	}
 	return words, nil
+}
+
+func (m MongoStore) dutchCollection() *mongo.Collection {
+	return m.client.Database("dutch").Collection("words")
 }
 
 func setup(uri string) (*mongo.Client, error) {

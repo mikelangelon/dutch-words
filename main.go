@@ -20,16 +20,8 @@ func main() {
 	if err != nil {
 		slog.Error("problem parsing dependencies", "error", err)
 	}
-	words, err := mongoStore.SearchWords()
-	if err != nil {
-		slog.Error("problem parsing dependencies", "error", err)
-	}
-	store := db.NewStore()
-	for _, v := range words {
-		store.Insert(v)
-	}
 
-	sv := server.New(services.NewService(store))
+	sv := server.New(services.NewService(mongoStore))
 
 	fmt.Println("Server is listening on http://localhost:8080")
 

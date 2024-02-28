@@ -2,15 +2,23 @@ package services
 
 import (
 	"github.com/mikelangelon/dutch-words/core"
-	"github.com/mikelangelon/dutch-words/db"
 )
 
 type Service struct {
-	store db.Store
+	store store
 }
 
-func NewService(store db.Store) Service {
+func NewService(store store) Service {
 	return Service{store: store}
+}
+
+type store interface {
+	Insert(word *core.Word) error
+	FindByID(id string) (*core.Word, error)
+	FindByDutch(dutch string) (*core.Word, error)
+	FindAll() ([]*core.Word, error)
+	FindBy(search core.Search) ([]*core.Word, error)
+	Delete(id string) error
 }
 
 func (s Service) InsertWord(word *core.Word) error {

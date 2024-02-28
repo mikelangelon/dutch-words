@@ -1,0 +1,8 @@
+# ignore geneated files
+.idea
+/vendor
+
+# include .gitkeep files
+!/**/.gitkeep
+
+*_templ.go
