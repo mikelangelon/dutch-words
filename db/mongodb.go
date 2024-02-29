@@ -64,8 +64,29 @@ func (m MongoStore) FindAll() ([]*core.Word, error) {
 }
 
 func (m MongoStore) FindBy(search core.Search) ([]*core.Word, error) {
-	//TODO implement me
-	panic("implement me")
+	var filter bson.M
+	if search.Tag != nil {
+		filter = bson.M{"tags": bson.M{"$in": []string{*search.Tag}}}
+	}
+
+	c, err := m.dutchCollection().Find(context.TODO(), filter)
+	if err != nil {
+		return nil, fmt.Errorf("problem searching words: %w", err)
+	}
+	var words []*core.Word
+	for c.Next(context.TODO()) {
+		var w Word
+		if err := c.Decode(&w); err != nil {
+			return nil, err
+		}
+		words = append(words, &core.Word{
+			ID:      w.Dutch,
+			Dutch:   w.Dutch,
+			English: w.English,
+			Tags:    w.Tags,
+		})
+	}
+	return words, nil
 }
 
 func (m MongoStore) Delete(id string) error {
@@ -88,7 +109,6 @@ func (m MongoStore) Insert(word *core.Word) error {
 }
 
 func (m MongoStore) searchWords(limit *int64) ([]*core.Word, error) {
-
 	var opts *options.FindOptions
 	if limit != nil {
 		opts = options.Find()
