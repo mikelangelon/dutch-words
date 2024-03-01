@@ -33,9 +33,6 @@ func (s Service) FindWordByID(id string) (*core.Word, error) {
 	return s.store.FindByID(id)
 }
 
-func (s Service) FindWordByDutch(dutch string) (*core.Word, error) {
-	return s.store.FindByDutch(dutch)
-}
 func (s Service) FindAllWords() ([]*core.Word, error) {
 	return s.store.FindAll()
 }

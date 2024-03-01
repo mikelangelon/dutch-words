@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/mikelangelon/dutch-words/config"
 	"github.com/mikelangelon/dutch-words/core"
@@ -36,29 +35,6 @@ func (m MongoStore) FindByID(id string) (*core.Word, error) {
 	//TODO implement me
 	panic("implement me")
 }
-
-func (m MongoStore) FindByDutch(dutch string) (*core.Word, error) {
-	filter := bson.M{
-		"$or": []bson.M{
-			{
-				"dutch": dutch,
-			},
-		},
-	}
-	s := m.client.Database("dutch").Collection("words").FindOne(context.TODO(), filter)
-	if s.Err() != nil {
-		if s.Err() == mongo.ErrNoDocuments {
-			return nil, errors.New("not found")
-		}
-		return nil, s.Err()
-	}
-	var w core.Word
-	if err := s.Decode(&w); err != nil {
-		return nil, err
-	}
-	return &w, nil
-}
-
 func (m MongoStore) FindAll() ([]*core.Word, error) {
 	return m.searchWords(nil)
 }
@@ -67,6 +43,12 @@ func (m MongoStore) FindBy(search core.Search) ([]*core.Word, error) {
 	var filter bson.M
 	if search.Tag != nil {
 		filter = bson.M{"tags": bson.M{"$in": []string{*search.Tag}}}
+	} else if search.DutchWord != nil {
+		filter = bson.M{"dutch": *search.DutchWord}
+	} else if search.EnglishWord != nil {
+		filter = bson.M{"english": *search.EnglishWord}
+	} else if search.ID != nil {
+		filter = bson.M{"_id": *search.ID}
 	}
 
 	c, err := m.dutchCollection().Find(context.TODO(), filter)
