@@ -50,14 +50,25 @@ func (m MongoStore) Delete(id string) error {
 	return nil
 }
 
+func (m MongoStore) GetAllTags() ([]string, error) {
+	results, err := m.dutchCollection().Distinct(context.TODO(), "tags", bson.M{})
+	if err != nil {
+		return nil, err
+	}
+	var tags = make([]string, len(results))
+	for i, _ := range results {
+		tags[i] = results[i].(string)
+	}
+	return tags, nil
+}
 func (m MongoStore) FindBy(search core.Search) ([]*core.Word, error) {
 	var filter bson.M
 	if search.Tag != nil {
 		filter = bson.M{"tags": bson.M{"$in": []string{*search.Tag}}}
 	} else if search.DutchWord != nil {
-		filter = bson.M{"dutch": *search.DutchWord}
+		filter = bson.M{"dutch": bson.D{{"$regex", fmt.Sprintf("^%s", *search.DutchWord)}}}
 	} else if search.EnglishWord != nil {
-		filter = bson.M{"english": *search.EnglishWord}
+		filter = bson.M{"english": bson.D{{"$regex", fmt.Sprintf("^%s", *search.EnglishWord)}}}
 	} else if search.ID != nil {
 		filter = bson.M{"_id": *search.ID}
 	}
