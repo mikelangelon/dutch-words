@@ -156,6 +156,17 @@ func (s *handler) getWords(w http.ResponseWriter, req *http.Request) {
 	}
 	components.WordList(ws).Render(req.Context(), w)
 }
+
+func (s *handler) renderTagsScreen(w http.ResponseWriter, req *http.Request) {
+	tags, err := s.Service.FindAllTags()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	navBar := components.NavBar(nav("Tags"))
+	components.Dashboard(navBar, components.Tags(tags)).Render(req.Context(), w)
+}
+
 func renderJSON(w http.ResponseWriter, v interface{}) {
 	js, err := json.Marshal(v)
 	if err != nil {
