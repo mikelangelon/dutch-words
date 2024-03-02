@@ -14,9 +14,6 @@ func NewService(store store) Service {
 
 type store interface {
 	Insert(word *core.Word) error
-	FindByID(id string) (*core.Word, error)
-	FindByDutch(dutch string) (*core.Word, error)
-	FindAll() ([]*core.Word, error)
 	FindBy(search core.Search) ([]*core.Word, error)
 	Delete(id string) error
 }
@@ -30,11 +27,15 @@ func (s Service) DeleteWord(id string) error {
 }
 
 func (s Service) FindWordByID(id string) (*core.Word, error) {
-	return s.store.FindByID(id)
+	ws, err := s.store.FindBy(core.Search{ID: &id})
+	if err != nil {
+		return nil, err
+	}
+	return ws[0], nil
 }
 
 func (s Service) FindAllWords() ([]*core.Word, error) {
-	return s.store.FindAll()
+	return s.store.FindBy(core.Search{})
 }
 
 func (s Service) FindWordsBy(search core.Search) ([]*core.Word, error) {

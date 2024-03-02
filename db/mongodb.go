@@ -31,12 +31,23 @@ type Word struct {
 	Tags       []string `bson:"tags,omitempty" json:"tags"`
 }
 
-func (m MongoStore) FindByID(id string) (*core.Word, error) {
-	//TODO implement me
-	panic("implement me")
+func (m MongoStore) Insert(word *core.Word) error {
+	ctx := context.TODO()
+	if _, err := m.dutchCollection().InsertOne(ctx, word); err != nil {
+		return fmt.Errorf("problem inserting word: %w", err)
+	}
+	return nil
 }
-func (m MongoStore) FindAll() ([]*core.Word, error) {
-	return m.searchWords(nil)
+
+func (m MongoStore) Delete(id string) error {
+	filter := bson.M{
+		"id": id,
+	}
+	_, err := m.dutchCollection().DeleteOne(context.TODO(), filter)
+	if err != nil {
+		return fmt.Errorf("problem deleting task: %w", err)
+	}
+	return nil
 }
 
 func (m MongoStore) FindBy(search core.Search) ([]*core.Word, error) {
@@ -69,25 +80,6 @@ func (m MongoStore) FindBy(search core.Search) ([]*core.Word, error) {
 		})
 	}
 	return words, nil
-}
-
-func (m MongoStore) Delete(id string) error {
-	filter := bson.M{
-		"id": id,
-	}
-	_, err := m.dutchCollection().DeleteOne(context.TODO(), filter)
-	if err != nil {
-		return fmt.Errorf("problem deleting task: %w", err)
-	}
-	return nil
-}
-
-func (m MongoStore) Insert(word *core.Word) error {
-	ctx := context.TODO()
-	if _, err := m.dutchCollection().InsertOne(ctx, word); err != nil {
-		return fmt.Errorf("problem inserting word: %w", err)
-	}
-	return nil
 }
 
 func (m MongoStore) searchWords(limit *int64) ([]*core.Word, error) {
