@@ -20,11 +20,11 @@ func New(service services.Service) *http.Server {
 	})
 	mux.HandleFunc("GET /web/tab3", func(w http.ResponseWriter, request *http.Request) {
 		navBar := components.NavBar(nav("Tags"))
-		components.Dashboard(navBar, components.Tags([]string{"tag1", "tag2", "tag3"})).Render(request.Context(), w)
+		components.Dashboard(navBar, components.Tags([]string{"verb", "adjective", "animal"})).Render(request.Context(), w)
 	})
 	mux.HandleFunc("GET /web/tags/{tag}", handler.tags)
 	mux.HandleFunc("GET /web/word/{id}", handler.getWord)
-	mux.HandleFunc("GET /web/word/dutch/{text}/", handler.getWorByDutch)
+	mux.HandleFunc("GET /web/word/dutch/{text}/", handler.getWordByDutch)
 	mux.HandleFunc("GET /web/word", handler.getWords)
 	mux.HandleFunc("POST /web/word", handler.createWord)
 	mux.HandleFunc("DELETE /web/word/{id}", handler.deleteWord)
