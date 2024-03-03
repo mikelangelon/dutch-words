@@ -7,14 +7,22 @@ import (
 
 templ TagsField(data core.FormData) {
 <div class="form-group" id="tags">
-   <label for="type">Tags</label>
-   <select name="tags" class="form-select" size="4" multiple aria-label="multiple select example">
-     for _, t := range data.Tags {
-           <option value={t}>{t}</option>
-     }
-   </select>
-    <input type="hidden" name="all_tags" value={strings.Join(data.Tags, ",")}/>
-    <input name="tag" type="text" class="form-control" id="english" aria-describedby="english" placeholder="English" />
-    <button type="submit" hx-post="/web/tags" hx-target="#tags">+</button>
+    <div>
+       <label for="tags"  class="form-label">Tags</label>
+       <select name="tags" class="form-select" size="4" multiple>
+         for _, t := range data.Tags {
+               <option value={t}>{t}</option>
+         }
+       </select>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <input type="hidden" name="all_tags" value={strings.Join(data.Tags, ",")}/>
+            <input name="tag" type="text" class="form-control" id="english" placeholder="New Tag" />
+        </div>
+        <div class="col-md-6">
+            <button type="submit" hx-post="/web/tags" hx-target="#tags">+</button>
+        </div>
+    </div>
 </div>
 }
