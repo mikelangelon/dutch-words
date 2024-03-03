@@ -11,7 +11,12 @@ templ TagsField(data core.FormData) {
        <label for="tags"  class="form-label">Tags</label>
        <select name="tags" class="form-select" size="4" multiple>
          for _, t := range data.Tags {
-               <option value={t}>{t}</option>
+                <option value={t}
+                if data.Word.HasTag(t){
+                     selected
+                 }
+                 >{t}</option>
+
          }
        </select>
     </div>
@@ -25,4 +30,5 @@ templ TagsField(data core.FormData) {
         </div>
     </div>
 </div>
+
 }
