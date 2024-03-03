@@ -1,0 +1,20 @@
+package components
+
+import (
+"github.com/mikelangelon/dutch-words/core"
+"strings"
+)
+
+templ TagsField(data core.FormData) {
+<div class="form-group" id="tags">
+   <label for="type">Tags</label>
+   <select name="tags" class="form-select" size="4" multiple aria-label="multiple select example">
+     for _, t := range data.Tags {
+           <option value={t}>{t}</option>
+     }
+   </select>
+    <input type="hidden" name="all_tags" value={strings.Join(data.Tags, ",")}/>
+    <input name="tag" type="text" class="form-control" id="english" aria-describedby="english" placeholder="English" />
+    <button type="submit" hx-post="/web/tags" hx-target="#tags">+</button>
+</div>
+}

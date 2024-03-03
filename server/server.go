@@ -19,6 +19,7 @@ func New(service services.Service) *http.Server {
 		components.Dashboard(navBar, components.WordSearch()).Render(request.Context(), w)
 	})
 	mux.HandleFunc("GET /web/tab3", handler.renderTagsScreen)
+	mux.HandleFunc("POST /web/tags", handler.newTags)
 	mux.HandleFunc("GET /web/tags/{tag}", handler.tags)
 	mux.HandleFunc("GET /web/word/{id}", handler.getWord)
 	mux.HandleFunc("GET /web/word/dutch/{text}/", handler.getWordByDutch)

@@ -55,9 +55,12 @@ func (m MongoStore) GetAllTags() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var tags = make([]string, len(results))
-	for i, _ := range results {
-		tags[i] = results[i].(string)
+	var tags []string
+	for _, v := range results {
+		if v == nil || len(v.(string)) == 0 {
+			continue
+		}
+		tags = append(tags, v.(string))
 	}
 	return tags, nil
 }
