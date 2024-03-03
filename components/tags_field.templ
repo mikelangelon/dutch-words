@@ -21,7 +21,7 @@ templ TagsField(data core.FormData) {
             <input name="tag" type="text" class="form-control" id="english" placeholder="New Tag" />
         </div>
         <div class="col-md-6">
-            <button type="submit" hx-post="/web/tags" hx-target="#tags">+</button>
+            <button type="submit" hx-post="/web/tags" hx-target="#tags" hx-trigger="click, keydown[keyCode==13] from:#english">+</button>
         </div>
     </div>
 </div>

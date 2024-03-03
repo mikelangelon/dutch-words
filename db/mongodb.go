@@ -25,15 +25,41 @@ func NewMongoStore(cfg *config.Config) (MongoStore, error) {
 }
 
 type Word struct {
+	ID         string   `bson:"_id" json:"id"`
 	Dutch      string   `bson:"dutch" json:"dutch"`
 	English    string   `bson:"english" json:"english"`
 	Difficulty *string  `bson:"difficulty,omitempty" json:"difficulty"`
 	Tags       []string `bson:"tags,omitempty" json:"tags"`
 }
 
+func (w Word) toEntity() *core.Word {
+	return &core.Word{
+		ID:      w.ID,
+		Dutch:   w.Dutch,
+		English: w.English,
+		Tags:    w.Tags,
+	}
+}
+
+func wordToDB(w *core.Word) Word {
+	return Word{
+		ID:      w.ID,
+		Dutch:   w.Dutch,
+		English: w.English,
+		Tags:    w.Tags,
+	}
+}
 func (m MongoStore) Insert(word *core.Word) error {
 	ctx := context.TODO()
-	if _, err := m.dutchCollection().InsertOne(ctx, word); err != nil {
+	if _, err := m.dutchCollection().InsertOne(ctx, wordToDB(word)); err != nil {
+		return fmt.Errorf("problem inserting word: %w", err)
+	}
+	return nil
+}
+
+func (m MongoStore) Update(word *core.Word) error {
+	ctx := context.TODO()
+	if _, err := m.dutchCollection().UpdateByID(ctx, word.ID, bson.M{"$set": wordToDB(word)}); err != nil {
 		return fmt.Errorf("problem inserting word: %w", err)
 	}
 	return nil
@@ -41,7 +67,7 @@ func (m MongoStore) Insert(word *core.Word) error {
 
 func (m MongoStore) Delete(id string) error {
 	filter := bson.M{
-		"id": id,
+		"_id": id,
 	}
 	_, err := m.dutchCollection().DeleteOne(context.TODO(), filter)
 	if err != nil {
@@ -86,12 +112,7 @@ func (m MongoStore) FindBy(search core.Search) ([]*core.Word, error) {
 		if err := c.Decode(&w); err != nil {
 			return nil, err
 		}
-		words = append(words, &core.Word{
-			ID:      w.Dutch,
-			Dutch:   w.Dutch,
-			English: w.English,
-			Tags:    w.Tags,
-		})
+		words = append(words, w.toEntity())
 	}
 	return words, nil
 }

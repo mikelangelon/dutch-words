@@ -6,8 +6,11 @@ import "github.com/mikelangelon/dutch-words/core"
 templ WordCard(word core.Word) {
 <div class="card">
     <div class="card-header">
+         <button hx-get={"/web/word/" + word.ID +"/edit" } class="btn btn-info" style="cursor: pointer;" hx-swap="outerHTML" hx-target="closest .card">
+          Edit
+         </button>
          <button hx-delete={"/web/word/" + word.ID } class="btn btn-danger" style="cursor: pointer;" hx-swap="outerHTML" hx-target="closest .card">
-           Delete
+          Delete
          </button>
     </div>
     <div class="card-body">

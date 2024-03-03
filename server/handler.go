@@ -44,7 +44,7 @@ func (s *handler) formAndList(w http.ResponseWriter, request *http.Request) {
 	for _, v := range words {
 		ws = append(ws, *v)
 	}
-	tab1 := components.Tabs(core.NewFormData(s.getTags()), ws)
+	tab1 := components.Tabs(core.NewFormData(nil, s.getTags()), ws)
 	components.Dashboard(navBar, tab1).Render(request.Context(), w)
 }
 
@@ -97,11 +97,10 @@ func (s *handler) tab1(w http.ResponseWriter, request *http.Request) {
 		ws = append(ws, *v)
 	}
 	navBar := components.NavBar(nav("Home"))
-	components.Dashboard(navBar, components.Tabs(core.NewFormData(s.getTags()), ws)).Render(request.Context(), w)
+	components.Dashboard(navBar, components.Tabs(core.NewFormData(nil, s.getTags()), ws)).Render(request.Context(), w)
 }
 
 func (s *handler) createWord(w http.ResponseWriter, req *http.Request) {
-
 	enableCors(&w)
 	dutch := req.FormValue("dutch")
 	english := req.FormValue("english")
@@ -109,14 +108,14 @@ func (s *handler) createWord(w http.ResponseWriter, req *http.Request) {
 	wordType := req.FormValue("type")
 
 	if dutch == "hond" {
-		data := core.NewFormData(s.getTags())
+		data := core.NewFormData(nil, s.getTags())
 		data.Errors["word"] = "something crazy"
 		components.WordForm(data).Render(req.Context(), w)
 		http.Error(w, "duplicated", http.StatusUnprocessableEntity)
 		return
 	}
-	word := &core.Word{Dutch: dutch, English: english, Tags: tags, Type: wordType}
-	err := s.Service.InsertWord(word)
+	word := core.NewWord(dutch, english, wordType, tags)
+	err := s.Service.InsertWord(&word)
 
 	words, err := s.Service.FindAllWords()
 	if err != nil {
@@ -126,10 +125,31 @@ func (s *handler) createWord(w http.ResponseWriter, req *http.Request) {
 	for _, v := range words {
 		ws = append(ws, *v)
 	}
-	components.WordForm(core.NewFormData(s.getTags())).Render(req.Context(), w)
-	components.WordExtra(*word).Render(req.Context(), w)
+	components.WordForm(core.NewFormData(nil, s.getTags())).Render(req.Context(), w)
+	components.WordExtra(word).Render(req.Context(), w)
 }
 
+func (s *handler) putWord(w http.ResponseWriter, req *http.Request) {
+	enableCors(&w)
+	id := req.PathValue("id")
+	dutch := req.FormValue("dutch")
+	english := req.FormValue("english")
+	tags := req.Form["tags"]
+
+	word := &core.Word{
+		ID:      id,
+		Dutch:   dutch,
+		English: english,
+		Tags:    tags,
+	}
+	if err := s.Service.UpdateWord(word); err != nil {
+		data := core.NewFormData(nil, s.getTags())
+		data.Errors["word"] = "something crazy"
+		components.WordForm(data).Render(req.Context(), w)
+		http.Error(w, "duplicated", http.StatusUnprocessableEntity)
+	}
+	components.WordCard(*word).Render(req.Context(), w)
+}
 func (s *handler) deleteWord(w http.ResponseWriter, req *http.Request) {
 	enableCors(&w)
 	err := s.Service.DeleteWord(req.PathValue("id"))
@@ -147,7 +167,17 @@ func (s *handler) getWord(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	renderJSON(w, word)
+	components.WordCard(*word).Render(req.Context(), w)
+}
+
+func (s *handler) getWordEdit(w http.ResponseWriter, req *http.Request) {
+	word, err := s.Service.FindWordByID(req.PathValue("id"))
+	if err != nil {
+		// TODO To improve error codes
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	components.WordCardEdit(core.NewFormData(word, s.getTags())).Render(req.Context(), w)
 }
 
 func (s *handler) getWordByDutch(w http.ResponseWriter, req *http.Request) {
