@@ -6,6 +6,7 @@ import (
 	"github.com/mikelangelon/dutch-words/core"
 	"github.com/mikelangelon/dutch-words/services"
 	"net/http"
+	"strings"
 )
 
 type handler struct {
@@ -36,14 +37,31 @@ func (s *handler) tags(w http.ResponseWriter, request *http.Request) {
 }
 func (s *handler) formAndList(w http.ResponseWriter, request *http.Request) {
 	enableCors(&w)
+
 	navBar := components.NavBar(nav("Home"))
 	words, _ := s.Service.FindAllWords()
 	var ws []core.Word
 	for _, v := range words {
 		ws = append(ws, *v)
 	}
-	tab1 := components.Tabs(core.NewFormData(), ws)
+	tab1 := components.Tabs(core.NewFormData(s.getTags()), ws)
 	components.Dashboard(navBar, tab1).Render(request.Context(), w)
+}
+
+func (s *handler) newTags(w http.ResponseWriter, request *http.Request) {
+	enableCors(&w)
+	tag := request.FormValue("tag")
+	allTags := strings.Split(request.FormValue("all_tags"), ",")
+	components.TagsField(core.FormData{
+		Tags: append(allTags, tag),
+	}).Render(request.Context(), w)
+}
+func (s *handler) getTags() []string {
+	t, err := s.Service.FindAllTags()
+	if err != nil {
+		// TODO Deal with tags issue. Maybe skip it?
+	}
+	return t
 }
 
 func nav(current string) core.NavigationItems {
@@ -79,10 +97,11 @@ func (s *handler) tab1(w http.ResponseWriter, request *http.Request) {
 		ws = append(ws, *v)
 	}
 	navBar := components.NavBar(nav("Home"))
-	components.Dashboard(navBar, components.Tabs(core.NewFormData(), ws)).Render(request.Context(), w)
+	components.Dashboard(navBar, components.Tabs(core.NewFormData(s.getTags()), ws)).Render(request.Context(), w)
 }
 
 func (s *handler) createWord(w http.ResponseWriter, req *http.Request) {
+
 	enableCors(&w)
 	dutch := req.FormValue("dutch")
 	english := req.FormValue("english")
@@ -90,7 +109,7 @@ func (s *handler) createWord(w http.ResponseWriter, req *http.Request) {
 	wordType := req.FormValue("type")
 
 	if dutch == "hond" {
-		data := core.NewFormData()
+		data := core.NewFormData(s.getTags())
 		data.Errors["word"] = "something crazy"
 		components.WordForm(data).Render(req.Context(), w)
 		http.Error(w, "duplicated", http.StatusUnprocessableEntity)
@@ -107,7 +126,7 @@ func (s *handler) createWord(w http.ResponseWriter, req *http.Request) {
 	for _, v := range words {
 		ws = append(ws, *v)
 	}
-	components.WordForm(core.NewFormData()).Render(req.Context(), w)
+	components.WordForm(core.NewFormData(s.getTags())).Render(req.Context(), w)
 	components.WordExtra(*word).Render(req.Context(), w)
 }
 

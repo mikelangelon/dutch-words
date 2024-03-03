@@ -4,7 +4,7 @@ import "github.com/mikelangelon/dutch-words/core"
 
 templ WordForm(data core.FormData) {
 <div id="container-form" class="container-fluid bg-secondary d-grid gap-3">
-    <form id="form" hx-post="/web/word" hx-target="#container-form" hx-swap="outerHTML">
+    <form id="form" >
             <label for="word">Word</label>
             <div class="form-group">
                 <input name="dutch" type="text" class="form-control" id="dutch" aria-describedby="dutch" placeholder="Dutch" />
@@ -24,16 +24,10 @@ templ WordForm(data core.FormData) {
                   <option value="adverb">Adverb</option>
                 </select>
             </div>
-            <div class="form-group">
-               <label for="type">Tags</label>
-               <select name="tags" class="form-select" size="5" multiple aria-label="multiple select example">
-                 <option selected></option>
-                 <option value="One">One</option>
-                 <option value="Two">Two</option>
-                 <option value="Three">Three</option>
-               </select>
-            </div>
-            <button type="submit" hx-confirm="Submit" class="btn btn-primary">Create Word</button>
+
+            @TagsField(data)
+
+            <button type="submit" class="btn btn-primary" hx-post="/web/word" hx-target="#container-form" hx-swap="outerHTML">Create Word</button>
             if len(data.Errors) > 0 {
                 <div class="alert alert-danger" role="alert">
                   Error!
