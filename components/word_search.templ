@@ -2,10 +2,10 @@ package components
 
 templ WordSearch() {
     <div id="container-form" class="container-fluid bg-light d-grid gap-3 p-3 border border-secondary">
-        <form id="search" hx-get="/web/word" hx-target="#search-results">
+        <form id="search" hx-trigger="">
             <label for="word">Word</label>
             <div class="form-group">
-                <input name="word" />
+                <input name="word" hx-get="/web/word" hx-target="#search-results" hx-trigger="input changed delay:500ms, search"/>
             </div>
        </form>
    </div>

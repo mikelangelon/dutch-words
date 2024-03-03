@@ -1,0 +1,34 @@
+package components
+
+import "github.com/mikelangelon/dutch-words/core"
+
+templ WordCardEdit(data core.FormData) {
+<div class="card text-white bg-dark mb-3" onkeydown="return event.key != 'Enter';" hx-trigger="">
+    <form>
+        <div class="card-header bg-secondary">
+             <button class="btn btn-light" hx-get={"/web/word/" + data.Word.ID } hx-swap="outerHTML" hx-target="closest .card">
+                Cancel
+             </button>
+             <button type="submit" class="btn btn-info" hx-put={"/web/word/" + data.Word.ID } hx-swap="outerHTML" hx-target="closest .card" hx-trigger="click">
+                Update Word
+             </button>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-1">Dutch</div>
+                <div class="col-2">
+                    <input name="dutch" type="text" class="form-control" id="dutch" value={ data.Word.Dutch}/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-1">English</div>
+                <div class="col-2">
+                     <input name="english" type="text" class="form-control" id="dutch" value={ data.Word.English}/>
+                </div>
+            </div>
+            @TagsField(data)
+        </div>
+    </form>
+
+</div>
+}
