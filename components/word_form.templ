@@ -3,37 +3,41 @@ package components
 import "github.com/mikelangelon/dutch-words/core"
 
 templ WordForm(data core.FormData) {
-<div id="container-form" class="container-fluid bg-secondary d-grid gap-3">
-    <form id="form" >
-            <label for="word">Word</label>
-            <div class="form-group">
-                <input name="dutch" type="text" class="form-control" id="dutch" aria-describedby="dutch" placeholder="Dutch" />
-                <small id="dutch" class="form-text text-muted">Word in dutch</small>
-            </div>
-             <div class="form-group">
-                <input name="english" type="text" class="form-control" id="english" aria-describedby="english" placeholder="English" />
-                <small id="english" class="form-text text-muted">Word in english</small>
-            </div>
-             <div class="form-group">
-               <label for="type">Type</label>
-                <select name="type" class="form-select" aria-label="Default select example">
-                  <option selected></option>
-                  <option value="noun">Noun</option>
-                  <option value="verb">Verb</option>
-                  <option value="adjective">Adjective</option>
-                  <option value="adverb">Adverb</option>
-                </select>
-            </div>
+<div id="container-form" class="container-fluid bg-light d-grid gap-3 p-3 border border-secondary">
+    <form id="form" class="row g-3">
+      <div class="col-md-6">
+          <label for="inputDutch" class="form-label">Dutch</label>
+          <input name="dutch" type="text" class="form-control" id="dutch"/>
+      </div>
+      <div class="col-md-6">
+         <label for="inputEnglish" class="form-label">English</label>
+         <input name="english" type="text" class="form-control" id="english"/>
+      </div>
 
-            @TagsField(data)
+       <div class="col-md-6">
+           <label for="type" class="form-label">Type</label>
+            <select name="type" class="form-select">
+              <option selected></option>
+              <option value="noun">Noun</option>
+              <option value="verb">Verb</option>
+              <option value="adjective">Adjective</option>
+              <option value="adverb">Adverb</option>
+            </select>
+        </div>
 
-            <button type="submit" class="btn btn-primary" hx-post="/web/word" hx-target="#container-form" hx-swap="outerHTML">Create Word</button>
-            if len(data.Errors) > 0 {
-                <div class="alert alert-danger" role="alert">
-                  Error!
-                </div>
-            }
-        </form>
+        @TagsField(data)
+
+        <div class="col-md-6">
+            <button type="submit" class="btn btn-info" hx-post="/web/word" hx-target="#container-form" hx-swap="outerHTML">
+                Create Word
+            </button>
+        </div>
+        if len(data.Errors) > 0 {
+            <div class="alert alert-danger" role="alert">
+              Error!
+            </div>
+        }
+    </form>
 </div>
 <script>
 document.addEventListener("DOMContentLoaded", (event) => {
