@@ -6,9 +6,9 @@ import (
 )
 
 templ TagsField(data core.FormData) {
-<div class="form-group" id="tags">
-    <div>
-       <label for="tags"  class="form-label">Tags</label>
+<div class="row mb-3">
+   <label for="tags"  class="col-sm-1 col-form-label">Tags</label>
+   <div class="col-sm-10">
        <select name="tags" class="form-select" size="4" multiple>
          for _, t := range data.Tags {
                 <option value={t}
@@ -16,18 +16,18 @@ templ TagsField(data core.FormData) {
                      selected
                  }
                  >{t}</option>
-
          }
        </select>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
-            <input type="hidden" name="all_tags" value={strings.Join(data.Tags, ",")}/>
-            <input name="tag" type="text" class="form-control" id="english" placeholder="New Tag" />
-        </div>
-        <div class="col-md-6">
-            <button type="submit" hx-post="/web/tags" hx-target="#tags" hx-trigger="click, keydown[keyCode==13] from:#english">+</button>
-        </div>
+   </div>
+</div>
+<div class="row mb-3">
+   <input type="hidden" name="all_tags" value={strings.Join(data.Tags, ",")}/>
+   <label for="tags"  class="col-sm-1 col-form-label"></label>
+   <div class="col-sm-8">
+        <input name="tag" type="text" class="form-control" id="english" placeholder="New tag"/>
+   </div>
+   <div class="col-sm-2">
+        <button type="submit" hx-post="/web/tags" hx-target="#tags" hx-trigger="click, keydown[keyCode==13] from:#english">+</button>
     </div>
 </div>
 

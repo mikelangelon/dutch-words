@@ -44,7 +44,7 @@ func (s *handler) formAndList(w http.ResponseWriter, request *http.Request) {
 	for _, v := range words {
 		ws = append(ws, *v)
 	}
-	tab1 := components.Tabs(core.NewFormData(nil, s.getTags()), ws)
+	tab1 := components.FormAndSearch(core.NewFormData(nil, s.getTags()), ws)
 	components.Dashboard(navBar, tab1).Render(request.Context(), w)
 }
 
@@ -97,7 +97,7 @@ func (s *handler) tab1(w http.ResponseWriter, request *http.Request) {
 		ws = append(ws, *v)
 	}
 	navBar := components.NavBar(nav("Home"))
-	components.Dashboard(navBar, components.Tabs(core.NewFormData(nil, s.getTags()), ws)).Render(request.Context(), w)
+	components.Dashboard(navBar, components.FormAndSearch(core.NewFormData(nil, s.getTags()), ws)).Render(request.Context(), w)
 }
 
 func (s *handler) createWord(w http.ResponseWriter, req *http.Request) {

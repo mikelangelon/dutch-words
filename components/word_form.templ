@@ -4,23 +4,27 @@ import "github.com/mikelangelon/dutch-words/core"
 
 templ WordForm(data core.FormData) {
 <div id="container-form" class="container-fluid bg-light d-grid gap-3 p-3 border border-secondary">
-    <form id="form" class="row g-3">
-      <div class="col-md-6">
-          <label for="inputDutch" class="form-label">Dutch</label>
-          <input name="dutch" type="text" class="form-control" id="dutch"/>
+    <form id="form">
+      <div class="row mb-3">
+          <label for="inputDutch" class="col-sm-1 col-form-label">Dutch</label>
+          <div class="col-sm-10">
+                <input name="dutch" type="text" class="form-control" id="dutch"/>
+          </div>
       </div>
-      <div class="col-md-6">
-         <label for="inputEnglish" class="form-label">English</label>
-         <input name="english" type="text" class="form-control" id="english"/>
+      <div class="row mb-3">
+         <label for="inputEnglish" class="col-sm-1 col-form-label">English</label>
+         <div class="col-sm-10">
+                <input name="english" type="text" class="form-control" id="english"/>
+         </div>
       </div>
 
         @TagsField(data)
 
-        <div class="col-md-6">
-            <button type="submit" class="btn btn-info" hx-post="/web/word" hx-target="#container-form" hx-swap="outerHTML">
-                Create Word
-            </button>
-        </div>
+
+        <button type="submit" class="btn btn-info" hx-post="/web/word" hx-target="#container-form" hx-swap="outerHTML">
+            Create Word
+        </button>
+
         if len(data.Errors) > 0 {
             <div class="alert alert-danger" role="alert">
               Error!
