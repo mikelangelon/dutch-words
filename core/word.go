@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"slices"
 	"time"
 )
 
@@ -21,4 +22,11 @@ func NewWord(dutch, english, wordType string, tags []string) Word {
 		Type:    wordType,
 		Tags:    tags,
 	}
+}
+
+func (w *Word) HasTag(tag string) bool {
+	if w == nil {
+		return false
+	}
+	return slices.Contains(w.Tags, tag)
 }

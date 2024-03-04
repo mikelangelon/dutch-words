@@ -14,17 +14,6 @@ templ WordForm(data core.FormData) {
          <input name="english" type="text" class="form-control" id="english"/>
       </div>
 
-       <div class="col-md-6">
-           <label for="type" class="form-label">Type</label>
-            <select name="type" class="form-select">
-              <option selected></option>
-              <option value="noun">Noun</option>
-              <option value="verb">Verb</option>
-              <option value="adjective">Adjective</option>
-              <option value="adverb">Adverb</option>
-            </select>
-        </div>
-
         @TagsField(data)
 
         <div class="col-md-6">
