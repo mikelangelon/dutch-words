@@ -1,0 +1,12 @@
+---
+# See https://golangci-lint.run/ for linters to enable and configure
+linters:
+  disable-all: true
+  enable:
+    - goimports
+    - govet
+    - typecheck
+    - unused
+    - errcheck
+    - ineffassign
+    - staticcheck

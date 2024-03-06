@@ -2,11 +2,13 @@ package server
 
 import (
 	"encoding/json"
+	"log/slog"
+	"net/http"
+	"strings"
+
 	"github.com/mikelangelon/dutch-words/components"
 	"github.com/mikelangelon/dutch-words/core"
 	"github.com/mikelangelon/dutch-words/services"
-	"net/http"
-	"strings"
 )
 
 type handler struct {
@@ -33,7 +35,10 @@ func (s *handler) tags(w http.ResponseWriter, request *http.Request) {
 	for _, v := range words {
 		ws = append(ws, *v)
 	}
-	components.WordList(ws).Render(request.Context(), w)
+	err = components.WordList(ws).Render(request.Context(), w)
+	if err != nil {
+		slog.Error("problem rendering", "error", err)
+	}
 }
 func (s *handler) formAndList(w http.ResponseWriter, request *http.Request) {
 	enableCors(&w)
@@ -45,21 +50,28 @@ func (s *handler) formAndList(w http.ResponseWriter, request *http.Request) {
 		ws = append(ws, *v)
 	}
 	tab1 := components.FormAndSearch(core.NewFormData(nil, s.getTags()), ws)
-	components.Dashboard(navBar, tab1).Render(request.Context(), w)
+	err := components.Dashboard(navBar, tab1).Render(request.Context(), w)
+	if err != nil {
+		slog.Error("problem rendering", "error", err)
+	}
 }
 
 func (s *handler) newTags(w http.ResponseWriter, request *http.Request) {
 	enableCors(&w)
 	tag := request.FormValue("tag")
 	allTags := strings.Split(request.FormValue("all_tags"), ",")
-	components.TagsField(core.FormData{
+	err := components.TagsField(core.FormData{
 		Tags: append(allTags, tag),
 	}).Render(request.Context(), w)
+	if err != nil {
+		slog.Error("problem rendering", "error", err)
+	}
 }
 func (s *handler) getTags() []string {
 	t, err := s.Service.FindAllTags()
 	if err != nil {
 		// TODO Deal with tags issue. Maybe skip it?
+		slog.Error("problem getting tags", "error", err)
 	}
 	return t
 }
@@ -97,7 +109,10 @@ func (s *handler) tab1(w http.ResponseWriter, request *http.Request) {
 		ws = append(ws, *v)
 	}
 	navBar := components.NavBar(nav("Home"))
-	components.Dashboard(navBar, components.FormAndSearch(core.NewFormData(nil, s.getTags()), ws)).Render(request.Context(), w)
+	err := components.Dashboard(navBar, components.FormAndSearch(core.NewFormData(nil, s.getTags()), ws)).Render(request.Context(), w)
+	if err != nil {
+		slog.Error("problem rendering", "error", err)
+	}
 }
 
 func (s *handler) createWord(w http.ResponseWriter, req *http.Request) {
@@ -110,23 +125,28 @@ func (s *handler) createWord(w http.ResponseWriter, req *http.Request) {
 	if dutch == "hond" {
 		data := core.NewFormData(nil, s.getTags())
 		data.Errors["word"] = "something crazy"
-		components.WordForm(data).Render(req.Context(), w)
+		err := components.WordForm(data).Render(req.Context(), w)
+		if err != nil {
+			slog.Error("problem rendering", "error", err)
+		}
 		http.Error(w, "duplicated", http.StatusUnprocessableEntity)
 		return
 	}
 	word := core.NewWord(dutch, english, wordType, tags)
 	err := s.Service.InsertWord(&word)
-
-	words, err := s.Service.FindAllWords()
 	if err != nil {
-		// TODO Deal with error
+		slog.Error("problem inserting word", "error", err)
+		http.Error(w, "duplicated", http.StatusInternalServerError)
+		return
 	}
-	var ws []core.Word
-	for _, v := range words {
-		ws = append(ws, *v)
+	err = components.WordForm(core.NewFormData(nil, s.getTags())).Render(req.Context(), w)
+	if err != nil {
+		slog.Error("problem rendering word form", "error", err)
 	}
-	components.WordForm(core.NewFormData(nil, s.getTags())).Render(req.Context(), w)
-	components.WordExtra(word).Render(req.Context(), w)
+	err = components.WordExtra(word).Render(req.Context(), w)
+	if err != nil {
+		slog.Error("problem rendering extra word", "error", err)
+	}
 }
 
 func (s *handler) putWord(w http.ResponseWriter, req *http.Request) {
@@ -145,10 +165,16 @@ func (s *handler) putWord(w http.ResponseWriter, req *http.Request) {
 	if err := s.Service.UpdateWord(word); err != nil {
 		data := core.NewFormData(nil, s.getTags())
 		data.Errors["word"] = "something crazy"
-		components.WordForm(data).Render(req.Context(), w)
+		err := components.WordForm(data).Render(req.Context(), w)
+		if err != nil {
+			slog.Error("problem rendering", "error", err)
+		}
 		http.Error(w, "duplicated", http.StatusUnprocessableEntity)
 	}
-	components.WordCard(*word).Render(req.Context(), w)
+	err := components.WordCard(*word).Render(req.Context(), w)
+	if err != nil {
+		slog.Error("problem rendering word card", "error", err)
+	}
 }
 func (s *handler) deleteWord(w http.ResponseWriter, req *http.Request) {
 	enableCors(&w)
@@ -167,7 +193,10 @@ func (s *handler) getWord(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	components.WordCard(*word).Render(req.Context(), w)
+	err = components.WordCard(*word).Render(req.Context(), w)
+	if err != nil {
+		return
+	}
 }
 
 func (s *handler) getWordEdit(w http.ResponseWriter, req *http.Request) {
@@ -177,7 +206,10 @@ func (s *handler) getWordEdit(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	components.WordCardEdit(core.NewFormData(word, s.getTags())).Render(req.Context(), w)
+	err = components.WordCardEdit(core.NewFormData(word, s.getTags())).Render(req.Context(), w)
+	if err != nil {
+		slog.Error("problem rendering word card edit")
+	}
 }
 
 func (s *handler) getWordByDutch(w http.ResponseWriter, req *http.Request) {
@@ -203,7 +235,10 @@ func (s *handler) getWords(w http.ResponseWriter, req *http.Request) {
 	for _, v := range words {
 		ws = append(ws, *v)
 	}
-	components.WordList(ws).Render(req.Context(), w)
+	err = components.WordList(ws).Render(req.Context(), w)
+	if err != nil {
+		slog.Error("problem rendering word list", "error", err)
+	}
 }
 
 func (s *handler) renderTagsScreen(w http.ResponseWriter, req *http.Request) {
@@ -213,7 +248,10 @@ func (s *handler) renderTagsScreen(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	navBar := components.NavBar(nav("Tags"))
-	components.Dashboard(navBar, components.Tags(tags)).Render(req.Context(), w)
+	err = components.Dashboard(navBar, components.Tags(tags)).Render(req.Context(), w)
+	if err != nil {
+		slog.Error("problem rendering dashboard", "error", err)
+	}
 }
 
 func renderJSON(w http.ResponseWriter, v interface{}) {
@@ -223,7 +261,10 @@ func renderJSON(w http.ResponseWriter, v interface{}) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(js)
+	_, err = w.Write(js)
+	if err != nil {
+		slog.Error("problem rendering JSON", "error", err)
+	}
 }
 
 func enableCors(w *http.ResponseWriter) {

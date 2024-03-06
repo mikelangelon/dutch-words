@@ -13,4 +13,9 @@ templ.install:
 templ.generate:
 	templ generate
 
+lint.install:
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.56.2
+
+lint.run:
+	golangci-lint run -c .golangci.yml -v --fix
 

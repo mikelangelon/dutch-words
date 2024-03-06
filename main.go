@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"log/slog"
+
 	"github.com/mikelangelon/dutch-words/config"
 	"github.com/mikelangelon/dutch-words/db"
 	"github.com/mikelangelon/dutch-words/server"
 	"github.com/mikelangelon/dutch-words/services"
-	"log/slog"
 )
 
 func main() {
