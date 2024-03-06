@@ -3,13 +3,14 @@ package db
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/mikelangelon/dutch-words/config"
 	"github.com/mikelangelon/dutch-words/core"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
-	"time"
 )
 
 type MongoStore struct {
@@ -95,9 +96,9 @@ func (m MongoStore) FindBy(search core.Search) ([]*core.Word, error) {
 	if search.Tag != nil {
 		filter = bson.M{"tags": bson.M{"$in": []string{*search.Tag}}}
 	} else if search.DutchWord != nil {
-		filter = bson.M{"dutch": bson.D{{"$regex", fmt.Sprintf("^%s", *search.DutchWord)}}}
+		filter = bson.M{"dutch": bson.D{{Key: "$regex", Value: fmt.Sprintf("^%s", *search.DutchWord)}}}
 	} else if search.EnglishWord != nil {
-		filter = bson.M{"english": bson.D{{"$regex", fmt.Sprintf("^%s", *search.EnglishWord)}}}
+		filter = bson.M{"english": bson.D{{Key: "$regex", Value: fmt.Sprintf("^%s", *search.EnglishWord)}}}
 	} else if search.ID != nil {
 		filter = bson.M{"_id": *search.ID}
 	}
@@ -116,33 +117,6 @@ func (m MongoStore) FindBy(search core.Search) ([]*core.Word, error) {
 	}
 	return words, nil
 }
-
-func (m MongoStore) searchWords(limit *int64) ([]*core.Word, error) {
-	var opts *options.FindOptions
-	if limit != nil {
-		opts = options.Find()
-		opts.SetLimit(*limit)
-	}
-	c, err := m.dutchCollection().Find(context.TODO(), bson.D{}, opts)
-	if err != nil {
-		return nil, fmt.Errorf("problem searching words: %w", err)
-	}
-	var words []*core.Word
-	for c.Next(context.TODO()) {
-		var w Word
-		if err := c.Decode(&w); err != nil {
-			return nil, err
-		}
-		words = append(words, &core.Word{
-			ID:      w.Dutch,
-			Dutch:   w.Dutch,
-			English: w.English,
-			Tags:    w.Tags,
-		})
-	}
-	return words, nil
-}
-
 func (m MongoStore) dutchCollection() *mongo.Collection {
 	return m.client.Database("dutch").Collection("words")
 }

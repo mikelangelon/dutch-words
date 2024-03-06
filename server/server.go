@@ -1,9 +1,11 @@
 package server
 
 import (
+	"log/slog"
+	"net/http"
+
 	"github.com/mikelangelon/dutch-words/components"
 	"github.com/mikelangelon/dutch-words/services"
-	"net/http"
 )
 
 func New(service services.Service) *http.Server {
@@ -16,7 +18,10 @@ func New(service services.Service) *http.Server {
 	mux.HandleFunc("GET /web/tab1", handler.tab1)
 	mux.HandleFunc("GET /web/tab2", func(w http.ResponseWriter, request *http.Request) {
 		navBar := components.NavBar(nav("Search"))
-		components.Dashboard(navBar, components.WordSearch()).Render(request.Context(), w)
+		err := components.Dashboard(navBar, components.WordSearch()).Render(request.Context(), w)
+		if err != nil {
+			slog.Error("problem rendering dashboard", "error", err)
+		}
 	})
 	mux.HandleFunc("GET /web/tab3", handler.renderTagsScreen)
 	mux.HandleFunc("POST /web/tags", handler.newTags)
