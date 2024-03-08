@@ -17,6 +17,21 @@ templ WordForm(data core.FormData) {
                 <input name="english" type="text" class="form-control" id="english"/>
          </div>
       </div>
+      <div class="row mb-3">
+           <label for="inputType" class="col-sm-1 col-form-label">Types</label>
+           <div class="col-sm-1">
+                  <input name="type" type="checkbox" value="noun"/><label for="scales">Noun</label>
+           </div>
+           <div class="col-sm-1">
+                <input name="type" type="checkbox" value="verb"/><label for="scales">Verb</label>
+            </div>
+            <div class="col-sm-1">
+                <input name="type" type="checkbox" value="adjective"/><label for="scales">Adjective</label>
+            </div>
+            <div class="col-sm-1">
+                <input name="type" type="checkbox" value="adverb"/><label for="scales">Adverb</label>
+            </div>
+      </div>
 
         @TagsField(data)
 
