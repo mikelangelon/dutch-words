@@ -120,7 +120,7 @@ func (s *handler) createWord(w http.ResponseWriter, req *http.Request) {
 	dutch := req.FormValue("dutch")
 	english := req.FormValue("english")
 	tags := req.Form["tags"]
-	wordType := req.FormValue("type")
+	types := req.Form["types"]
 
 	if dutch == "hond" {
 		data := core.NewFormData(nil, s.getTags())
@@ -132,7 +132,7 @@ func (s *handler) createWord(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "duplicated", http.StatusUnprocessableEntity)
 		return
 	}
-	word := core.NewWord(dutch, english, wordType, tags)
+	word := core.NewWord(dutch, english, types, tags)
 	err := s.Service.InsertWord(&word)
 	if err != nil {
 		slog.Error("problem inserting word", "error", err)
@@ -154,12 +154,14 @@ func (s *handler) putWord(w http.ResponseWriter, req *http.Request) {
 	id := req.PathValue("id")
 	dutch := req.FormValue("dutch")
 	english := req.FormValue("english")
+	types := req.Form["types"]
 	tags := req.Form["tags"]
 
 	word := &core.Word{
 		ID:      id,
 		Dutch:   dutch,
 		English: english,
+		Types:   types,
 		Tags:    tags,
 	}
 	if err := s.Service.UpdateWord(word); err != nil {
