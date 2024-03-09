@@ -1,0 +1,22 @@
+package components
+
+import (
+    "github.com/mikelangelon/dutch-words/core"
+)
+
+templ TypesField(data core.FormData) {
+  <div class="row mb-3">
+       <label for="inputType" class="col-sm-1 col-form-label">Types</label>
+       for _, t := range []string{"noun", "verb", "adjective", "adverb"} {
+            <div class="col-sm-1">
+                <input name="types" type="checkbox" value={t}
+                    if data.Word.HasType(t){
+                         checked
+                     }
+                />
+                <label for="scales">{t}</label>
+            </div>
+       }
+  </div>
+
+}

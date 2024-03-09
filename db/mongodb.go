@@ -30,6 +30,7 @@ type Word struct {
 	Dutch      string   `bson:"dutch" json:"dutch"`
 	English    string   `bson:"english" json:"english"`
 	Difficulty *string  `bson:"difficulty,omitempty" json:"difficulty"`
+	Types      []string `bson:"types,omitempty" json:"types"`
 	Tags       []string `bson:"tags,omitempty" json:"tags"`
 }
 
@@ -38,6 +39,7 @@ func (w Word) toEntity() *core.Word {
 		ID:      w.ID,
 		Dutch:   w.Dutch,
 		English: w.English,
+		Types:   w.Types,
 		Tags:    w.Tags,
 	}
 }
@@ -47,6 +49,7 @@ func wordToDB(w *core.Word) Word {
 		ID:      w.ID,
 		Dutch:   w.Dutch,
 		English: w.English,
+		Types:   w.Types,
 		Tags:    w.Tags,
 	}
 }

@@ -26,6 +26,7 @@ templ WordCardEdit(data core.FormData) {
                      <input name="english" type="text" class="form-control" id="dutch" value={ data.Word.English}/>
                 </div>
             </div>
+            @TypesField(data)
             @TagsField(data)
         </div>
     </form>
