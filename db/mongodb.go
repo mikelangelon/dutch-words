@@ -124,6 +124,10 @@ func (m MongoStore) dutchCollection() *mongo.Collection {
 	return m.client.Database("dutch").Collection("words")
 }
 
+func (m MongoStore) sentencesCollection() *mongo.Collection {
+	return m.client.Database("dutch").Collection("sentences")
+}
+
 func setup(uri string) (*mongo.Client, error) {
 	clientOptions := options.Client().
 		ApplyURI(uri)

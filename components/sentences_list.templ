@@ -1,0 +1,11 @@
+package components
+
+import "github.com/mikelangelon/dutch-words/core"
+
+templ SentencesList(sentences []*core.Sentence) {
+	<div id="sentences">
+		for _, s := range sentences {
+			@SentenceEdit(core.SentenceData{Sentence: *s})
+		}
+	</div>
+}

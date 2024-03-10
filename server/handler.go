@@ -1,7 +1,10 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
+	"github.com/a-h/templ"
+	"io"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -12,12 +15,14 @@ import (
 )
 
 type handler struct {
-	Service services.Service
+	Service          services.Service
+	SentencesService services.SentencesService
 }
 
-func newHandler(service services.Service) *handler {
+func newHandler(service services.Service, sentencesService services.SentencesService) *handler {
 	return &handler{
-		Service: service,
+		Service:          service,
+		SentencesService: sentencesService,
 	}
 }
 
@@ -79,19 +84,20 @@ func (s *handler) getTags() []string {
 func nav(current string) core.NavigationItems {
 	items := core.NavigationItems{
 		{
-			Label:  "Home",
-			Link:   "/web/tab1",
-			Active: false,
+			Label: "Home",
+			Link:  "/web/tab1",
 		},
 		{
-			Label:  "Search",
-			Link:   "/web/tab2",
-			Active: false,
+			Label: "Sentences",
+			Link:  "/web/sentence-tab",
 		},
 		{
-			Label:  "Tags",
-			Link:   "/web/tab3",
-			Active: false,
+			Label: "Search",
+			Link:  "/web/tab2",
+		},
+		{
+			Label: "Tags",
+			Link:  "/web/tab3",
 		},
 	}
 	for _, v := range items {
@@ -114,7 +120,6 @@ func (s *handler) tab1(w http.ResponseWriter, request *http.Request) {
 		slog.Error("problem rendering", "error", err)
 	}
 }
-
 func (s *handler) createWord(w http.ResponseWriter, req *http.Request) {
 	enableCors(&w)
 	dutch := req.FormValue("dutch")
@@ -271,4 +276,20 @@ func renderJSON(w http.ResponseWriter, v interface{}) {
 
 func enableCors(w *http.ResponseWriter) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+}
+
+func formAndList(sentences []*core.Sentence) templ.Component {
+	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) error {
+		err := components.SentenceEdit(core.SentenceData{Sentence: core.Sentence{}}).Render(context.TODO(), w)
+		if err != nil {
+			return err
+		}
+		_, err = io.WriteString(w, "<div>")
+		err = components.SentencesList(sentences).Render(context.TODO(), w)
+		if err != nil {
+			return err
+		}
+		_, err = io.WriteString(w, "</div>")
+		return nil
+	})
 }

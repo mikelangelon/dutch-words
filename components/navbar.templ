@@ -5,22 +5,21 @@ import "github.com/mikelangelon/dutch-words/core"
 templ NavBar(items core.NavigationItems) {
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary my-3 px-2">
-<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown">
-  <span class="navbar-toggler-icon"></span>
-</button>
-<div class="collapse navbar-collapse" id="navbarNavDropdown">
-  <ul class="navbar-nav" id="navbar">
-    for _, item := range items {
-        <li class="nav-item">
-                if item.Active {
-                    <a class="nav-link active" hx-get={item.Link} hx-push-url="true" hx-swap="innerHTML" hx-target="body" hx-boost="true">{ item.Label } </a>
-                } else {
-                    <a class="nav-link" hx-get={item.Link} hx-push-url="true" hx-swap="innerHTML" hx-target="body" hx-boost="true">{ item.Label } </a>
-                }
-
-        </li>
-    }
-  </ul>
-</div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav" id="navbar">
+            for _, item := range items {
+                <li class="nav-item">
+                    if item.Active {
+                        <a class="nav-link active" hx-get={item.Link} hx-push-url="true" hx-swap="innerHTML" hx-target="body" hx-boost="true">{ item.Label } </a>
+                    } else {
+                        <a class="nav-link" hx-get={item.Link} hx-push-url="true" hx-swap="innerHTML" hx-target="body" hx-boost="true">{ item.Label } </a>
+                    }
+                </li>
+            }
+        </ul>
+    </div>
 </nav>
 }
