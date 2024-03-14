@@ -2,9 +2,11 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"github.com/mikelangelon/dutch-words/core"
 	"log/slog"
 	"net/http"
+	"time"
 
 	"github.com/mikelangelon/dutch-words/components"
 	"github.com/mikelangelon/dutch-words/services"
@@ -21,8 +23,13 @@ func New(service services.Service, ss services.SentencesService) *http.Server {
 	mux.HandleFunc("GET /web/sentence-tab", func(w http.ResponseWriter, request *http.Request) {
 		enableCors(&w)
 		navBar := components.NavBar(nav("Sentences"))
-		list := formAndList([]*core.Sentence{{ID: "1233", Dutch: "ABCD", English: "4567"}})
-		err := components.Dashboard(navBar, list).Render(request.Context(), w)
+		sentences, err := handler.SentencesService.FindAll()
+		if err != nil {
+			slog.Error("problem retrieving all sentences", "error", err)
+			return
+		}
+		list := formAndList(sentences)
+		err = components.Dashboard(navBar, list).Render(request.Context(), w)
 		if err != nil {
 			slog.Error("problem rendering dashboard", "error", err)
 		}
@@ -47,18 +54,29 @@ func New(service services.Service, ss services.SentencesService) *http.Server {
 
 	mux.HandleFunc("POST /web/sentences", func(writer http.ResponseWriter, request *http.Request) {
 		if err := handler.SentencesService.Insert(&core.Sentence{
+			ID:      fmt.Sprintf("%d", time.Now().UnixNano()),
 			Dutch:   request.FormValue("dutch"),
 			English: request.FormValue("english"),
 		}); err != nil {
 			slog.Error("problem inserting sentence", "error", err)
 		}
+		err := components.SentenceEdit(core.SentenceData{Sentence: core.Sentence{}}).Render(context.TODO(), writer)
+		if err != nil {
+			return
+		}
 	})
 	mux.HandleFunc("PUT /web/sentences/{id}", func(writer http.ResponseWriter, request *http.Request) {
-		if err := handler.SentencesService.Update(&core.Sentence{
+		sentence := &core.Sentence{
+			ID:      request.PathValue("id"),
 			Dutch:   request.FormValue("dutch"),
 			English: request.FormValue("english"),
-		}); err != nil {
+		}
+		if err := handler.SentencesService.Update(sentence); err != nil {
 			slog.Error("problem update sentence", "error", err)
+		}
+		err := components.SentenceEdit(core.SentenceData{Sentence: *sentence}).Render(context.TODO(), writer)
+		if err != nil {
+			return
 		}
 	})
 	mux.HandleFunc("DELETE /web/sentences/{id}", func(writer http.ResponseWriter, request *http.Request) {

@@ -3,7 +3,8 @@ package components
 import "github.com/mikelangelon/dutch-words/core"
 
 templ SentenceEdit(data core.SentenceData) {
-    <div
+
+    <div class="container-form"
         if data.Sentence.ID != "" {
             class="card text-black bg-blue mb-3"
         } else {
@@ -16,7 +17,7 @@ templ SentenceEdit(data core.SentenceData) {
                  <button class="btn btn-light" hx-get={"/web/sentences/" + data.Sentence.ID } hx-swap="outerHTML" hx-target="closest .card">
                     Cancel
                  </button>
-                 <button type="submit" class="btn btn-info" hx-put={"/web/sentences/" + data.Sentence.ID } hx-swap="outerHTML" hx-target="closest .card" hx-trigger="click">
+                 <button type="submit" class="btn btn-info" hx-put={"/web/sentences/" + data.Sentence.ID } hx-swap="outerHTML" hx-target="closest .card">
                     Update Sentence
                  </button>
             </div>
@@ -38,7 +39,7 @@ templ SentenceEdit(data core.SentenceData) {
         </div>
         if data.Sentence.ID == "" {
             <div class="card-footer bg-secondary">
-                 <button type="submit" class="btn btn-info" hx-post="/web/sentences" hx-swap="outerHTML" hx-target="closest .card" hx-trigger="click">
+                 <button type="submit" class="btn btn-info" hx-post="/web/sentences" hx-target="#container-form" hx-swap="outerHTML">
                     Create Sentence
                  </button>
             </div>
