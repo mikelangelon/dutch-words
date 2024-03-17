@@ -52,6 +52,30 @@ func New(service services.Service, ss services.SentencesService) *http.Server {
 	mux.HandleFunc("PUT /web/word/{id}", handler.putWord)
 	mux.HandleFunc("DELETE /web/word/{id}", handler.deleteWord)
 
+	mux.HandleFunc("GET /web/sentences/{id}/edit", func(w http.ResponseWriter, r *http.Request) {
+		sentence, err := handler.SentencesService.FindById(r.PathValue("id"))
+		if err != nil {
+			// TODO To improve error codes
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		err = components.SentenceEdit(core.NewSentenceData(*sentence)).Render(r.Context(), w)
+		if err != nil {
+			slog.Error("problem rendering word card edit")
+		}
+	})
+	mux.HandleFunc("GET /web/sentences/{id}", func(w http.ResponseWriter, r *http.Request) {
+		sentence, err := handler.SentencesService.FindById(r.PathValue("id"))
+		if err != nil {
+			// TODO To improve error codes
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		err = components.SentencesCard(*sentence).Render(r.Context(), w)
+		if err != nil {
+			slog.Error("problem rendering word card edit")
+		}
+	})
 	mux.HandleFunc("POST /web/sentences", func(writer http.ResponseWriter, request *http.Request) {
 		if err := handler.SentencesService.Insert(&core.Sentence{
 			ID:      fmt.Sprintf("%d", time.Now().UnixNano()),
@@ -74,7 +98,7 @@ func New(service services.Service, ss services.SentencesService) *http.Server {
 		if err := handler.SentencesService.Update(sentence); err != nil {
 			slog.Error("problem update sentence", "error", err)
 		}
-		err := components.SentenceEdit(core.SentenceData{Sentence: *sentence}).Render(context.TODO(), writer)
+		err := components.SentencesCard(*sentence).Render(context.TODO(), writer)
 		if err != nil {
 			return
 		}

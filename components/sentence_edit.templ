@@ -3,8 +3,7 @@ package components
 import "github.com/mikelangelon/dutch-words/core"
 
 templ SentenceEdit(data core.SentenceData) {
-
-    <div class="container-form"
+    <div onkeydown="return event.key != 'Enter';" hx-trigger=""
         if data.Sentence.ID != "" {
             class="card text-black bg-blue mb-3"
         } else {
@@ -45,7 +44,6 @@ templ SentenceEdit(data core.SentenceData) {
             </div>
         }
     </form>
-
 </div>
 }
 

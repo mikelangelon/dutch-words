@@ -55,8 +55,15 @@ func (m MongoStore) DeleteSentence(id string) error {
 	return nil
 }
 
-func (m MongoStore) FindSentencesBy() ([]*core.Sentence, error) {
+func (m MongoStore) FindSentencesBy(search core.Search) ([]*core.Sentence, error) {
 	var filter bson.M
+	if search.DutchWord != nil {
+		filter = bson.M{"dutch": bson.D{{Key: "$regex", Value: fmt.Sprintf("^%s", *search.DutchWord)}}}
+	} else if search.EnglishWord != nil {
+		filter = bson.M{"english": bson.D{{Key: "$regex", Value: fmt.Sprintf("^%s", *search.EnglishWord)}}}
+	} else if search.ID != nil {
+		filter = bson.M{"_id": *search.ID}
+	}
 	c, err := m.sentencesCollection().Find(context.TODO(), filter)
 	if err != nil {
 		return nil, fmt.Errorf("problem searching sentence: %w", err)
