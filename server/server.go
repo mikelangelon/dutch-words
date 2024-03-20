@@ -3,10 +3,11 @@ package server
 import (
 	"context"
 	"fmt"
-	"github.com/mikelangelon/dutch-words/core"
 	"log/slog"
 	"net/http"
 	"time"
+
+	"github.com/mikelangelon/dutch-words/core"
 
 	"github.com/mikelangelon/dutch-words/components"
 	"github.com/mikelangelon/dutch-words/services"
@@ -77,16 +78,21 @@ func New(service services.Service, ss services.SentencesService) *http.Server {
 		}
 	})
 	mux.HandleFunc("POST /web/sentences", func(writer http.ResponseWriter, request *http.Request) {
-		if err := handler.SentencesService.Insert(&core.Sentence{
+		sentence := core.Sentence{
 			ID:      fmt.Sprintf("%d", time.Now().UnixNano()),
 			Dutch:   request.FormValue("dutch"),
 			English: request.FormValue("english"),
-		}); err != nil {
+		}
+		if err := handler.SentencesService.Insert(&sentence); err != nil {
 			slog.Error("problem inserting sentence", "error", err)
 		}
 		err := components.SentenceEdit(core.SentenceData{Sentence: core.Sentence{}}).Render(context.TODO(), writer)
 		if err != nil {
 			return
+		}
+		err = components.SentenceExtra(sentence).Render(request.Context(), writer)
+		if err != nil {
+			slog.Error("problem rendering extra sentence", "error", err)
 		}
 	})
 	mux.HandleFunc("PUT /web/sentences/{id}", func(writer http.ResponseWriter, request *http.Request) {

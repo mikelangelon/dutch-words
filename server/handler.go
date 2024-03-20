@@ -3,11 +3,12 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"github.com/a-h/templ"
 	"io"
 	"log/slog"
 	"net/http"
 	"strings"
+
+	"github.com/a-h/templ"
 
 	"github.com/mikelangelon/dutch-words/components"
 	"github.com/mikelangelon/dutch-words/core"
@@ -285,11 +286,17 @@ func formAndList(sentences []*core.Sentence) templ.Component {
 			return err
 		}
 		_, err = io.WriteString(w, "<div>")
+		if err != nil {
+			return err
+		}
 		err = components.SentencesList(sentences).Render(context.TODO(), w)
 		if err != nil {
 			return err
 		}
 		_, err = io.WriteString(w, "</div>")
+		if err != nil {
+			return err
+		}
 		return nil
 	})
 }

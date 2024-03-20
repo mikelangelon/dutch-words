@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+
 	"github.com/mikelangelon/dutch-words/core"
 	"go.mongodb.org/mongo-driver/bson"
 )
