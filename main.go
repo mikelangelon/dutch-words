@@ -22,7 +22,7 @@ func main() {
 		slog.Error("problem parsing dependencies", "error", err)
 	}
 
-	sv := server.New(services.NewService(mongoStore))
+	sv := server.New(services.NewService(mongoStore), services.NewSentencesService(mongoStore))
 
 	fmt.Println("Server is listening on http://localhost:8080")
 

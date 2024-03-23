@@ -1,0 +1,26 @@
+package components
+
+import "github.com/mikelangelon/dutch-words/core"
+
+templ SentencesCard(sentence core.Sentence) {
+<div class="card">
+    <div class="card-header">
+         <button hx-get={"/web/sentences/" + sentence.ID +"/edit" } class="btn btn-info" style="cursor: pointer;" hx-swap="outerHTML" hx-target="closest .card">
+          Edit
+         </button>
+         <button hx-delete={"/web/sentences/" + sentence.ID } class="btn btn-danger" style="cursor: pointer;" hx-swap="outerHTML" hx-target="closest .card">
+          Delete
+         </button>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-1">Dutch</div>
+            <div class="col-2">{ sentence.Dutch}</div>
+        </div>
+        <div class="row">
+            <div class="col-1">English</div>
+            <div class="col-2">{ sentence.English}</div>
+        </div>
+    </div>
+</div>
+}

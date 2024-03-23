@@ -1,0 +1,9 @@
+package components
+
+import "github.com/mikelangelon/dutch-words/core"
+
+templ SentenceExtra(sentence core.Sentence) {
+    <div id="sentences" hx-swap-oob="afterbegin">
+        @SentencesCard(sentence)
+    </div>
+}

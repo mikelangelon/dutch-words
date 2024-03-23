@@ -29,6 +29,9 @@ func (w *Word) HasTag(tag string) bool {
 }
 
 func (w *Word) HasType(s string) bool {
+	if w == nil {
+		return false
+	}
 	return w.has(s, w.Types)
 }
 

@@ -1,0 +1,49 @@
+package components
+
+import "github.com/mikelangelon/dutch-words/core"
+
+templ SentenceEdit(data core.SentenceData) {
+    <div id="container-form" onkeydown="return event.key != 'Enter';" hx-trigger=""
+        if data.Sentence.ID != "" {
+            class="card text-black bg-blue mb-3"
+        } else {
+            class="card text-white bg-dark mb-3"
+        }
+    >
+    <form>
+        if data.Sentence.ID != "" {
+            <div class="card-header bg-secondary">
+                 <button class="btn btn-light" hx-get={"/web/sentences/" + data.Sentence.ID } hx-swap="outerHTML" hx-target="closest .card">
+                    Cancel
+                 </button>
+                 <button type="submit" class="btn btn-info" hx-put={"/web/sentences/" + data.Sentence.ID } hx-swap="outerHTML" hx-target="closest .card">
+                    Update Sentence
+                 </button>
+            </div>
+        }
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-1">Dutch</div>
+                <div class="col-10">
+                    <input name="dutch" type="text" class="form-control" id="dutch" value={ data.Sentence.Dutch}/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-1">English</div>
+                <div class="col-10">
+                     <input name="english" type="text" class="form-control" id="dutch" value={ data.Sentence.English}/>
+                </div>
+            </div>
+        </div>
+        if data.Sentence.ID == "" {
+            <div class="card-footer bg-secondary">
+                 <button type="submit" class="btn btn-info" hx-post="/web/sentences" hx-target="#container-form" hx-swap="outerHTML" hx-trigger="click">
+                    Create Sentence
+                 </button>
+            </div>
+        }
+    </form>
+</div>
+}
+
