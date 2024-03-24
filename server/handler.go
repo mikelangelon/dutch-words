@@ -18,12 +18,14 @@ import (
 type handler struct {
 	Service          services.Service
 	SentencesService services.SentencesService
+	gameCache        map[string]core.Question
 }
 
 func newHandler(service services.Service, sentencesService services.SentencesService) *handler {
 	return &handler{
 		Service:          service,
 		SentencesService: sentencesService,
+		gameCache:        make(map[string]core.Question),
 	}
 }
 
@@ -99,6 +101,10 @@ func nav(current string) core.NavigationItems {
 		{
 			Label: "Tags",
 			Link:  "/web/tab3",
+		},
+		{
+			Label: "Game",
+			Link:  "/game",
 		},
 	}
 	for _, v := range items {
@@ -299,4 +305,74 @@ func formAndList(sentences []*core.Sentence) templ.Component {
 		}
 		return nil
 	})
+}
+
+func (s *handler) game(w http.ResponseWriter, request *http.Request) {
+	enableCors(&w)
+
+	navBar := components.NavBar(nav("Game"))
+	question := core.Question{
+		ID:   "asadda",
+		Word: "A",
+		Options: []core.Option{
+			{Text: "A"},
+			{Text: "B"},
+			{Text: "C"},
+			{Text: "D"},
+		},
+	}
+	s.gameCache[question.ID] = question
+	err := components.Dashboard(navBar, components.Game(question)).Render(request.Context(), w)
+	if err != nil {
+		slog.Error("problem rendering", "error", err)
+	}
+}
+
+func (s *handler) gameWord(w http.ResponseWriter, request *http.Request) {
+	question := s.gameCache[request.PathValue("id")]
+	selected := request.FormValue("selected")
+
+	var next, retry bool
+	var options []core.Option
+	for _, v := range question.Options {
+		var opt core.Option
+		opt.Text = v.Text
+		if v.Text == selected && v.Text == question.Word {
+			opt.Status = 1
+			next = true
+		} else if v.Text == selected && v.Text != question.Word {
+			opt.Status = 2
+			retry = true
+		} else if v.Text != selected && v.Text == question.Word {
+			opt.Status = 3
+		}
+		options = append(options, opt)
+	}
+
+	question.Options = options
+	question.Next = next
+	question.Retry = retry
+	err := components.Game(question).Render(request.Context(), w)
+	if err != nil {
+		slog.Error("problem rendering", "error", err)
+	}
+}
+
+func (s *handler) nextGameWord(w http.ResponseWriter, request *http.Request) {
+	question := s.gameCache[request.PathValue("id")]
+	question = core.Question{
+		ID:   "asadda",
+		Word: "Next",
+		Options: []core.Option{
+			{Text: "AA"},
+			{Text: "ED"},
+			{Text: "FD"},
+			{Text: "DD"},
+		},
+	}
+	s.gameCache[question.ID] = question
+	err := components.Dashboard(components.NavBar(nav("Game")), components.Game(question)).Render(request.Context(), w)
+	if err != nil {
+		slog.Error("problem rendering", "error", err)
+	}
 }
