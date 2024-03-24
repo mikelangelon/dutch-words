@@ -17,6 +17,9 @@ func New(service services.Service, ss services.SentencesService) *http.Server {
 	handler := newHandler(service, ss)
 	mux := http.NewServeMux()
 
+	mux.HandleFunc("GET /game", handler.game)
+	mux.HandleFunc("POST /game/word/{id}", handler.gameWord)
+	mux.HandleFunc("GET /game/word/{id}", handler.nextGameWord)
 	// Routing
 	mux.HandleFunc("GET /", handler.formAndList)
 	mux.HandleFunc("GET /web/", handler.formAndList)
