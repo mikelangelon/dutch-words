@@ -1,8 +1,9 @@
 package services
 
 import (
-	"github.com/mikelangelon/dutch-words/core"
 	"log/slog"
+
+	"github.com/mikelangelon/dutch-words/core"
 )
 
 type GameService struct {

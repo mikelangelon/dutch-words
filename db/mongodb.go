@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -140,9 +141,9 @@ func (m MongoStore) SearchBy(search core.Search) ([]*core.Word, error) {
 		return nil, err
 	}
 	defer func(c *mongo.Cursor, ctx context.Context) {
-		err := c.Close(ctx)
-		if err != nil {
-			// TODO handle error
+		closeErr := c.Close(ctx)
+		if closeErr != nil {
+			err = errors.Join(err, closeErr)
 		}
 	}(c, ctx)
 
