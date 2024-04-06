@@ -13,8 +13,8 @@ import (
 	"github.com/mikelangelon/dutch-words/services"
 )
 
-func New(service services.Service, ss services.SentencesService) *http.Server {
-	handler := newHandler(service, ss)
+func New(service services.Service, ss services.SentencesService, gs services.GameService) *http.Server {
+	handler := newHandler(service, ss, gs)
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /game", handler.game)

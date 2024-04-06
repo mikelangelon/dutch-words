@@ -5,4 +5,5 @@ type Search struct {
 	DutchWord   *string
 	EnglishWord *string
 	ID          *string
+	Limit       int
 }

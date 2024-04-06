@@ -18,14 +18,16 @@ import (
 type handler struct {
 	Service          services.Service
 	SentencesService services.SentencesService
-	gameCache        map[string]core.Question
+	GameService      services.GameService
+	gameCache        map[string]core.Game
 }
 
-func newHandler(service services.Service, sentencesService services.SentencesService) *handler {
+func newHandler(service services.Service, sentencesService services.SentencesService, gameService services.GameService) *handler {
 	return &handler{
 		Service:          service,
 		SentencesService: sentencesService,
-		gameCache:        make(map[string]core.Question),
+		GameService:      gameService,
+		gameCache:        make(map[string]core.Game),
 	}
 }
 
@@ -311,39 +313,32 @@ func (s *handler) game(w http.ResponseWriter, request *http.Request) {
 	enableCors(&w)
 
 	navBar := components.NavBar(nav("Game"))
-	question := core.Question{
-		ID:   "asadda",
-		Word: "A",
-		Options: []core.Option{
-			{Text: "A"},
-			{Text: "B"},
-			{Text: "C"},
-			{Text: "D"},
-		},
-	}
-	s.gameCache[question.ID] = question
-	err := components.Dashboard(navBar, components.Game(question)).Render(request.Context(), w)
+	game := s.GameService.NewGame()
+	s.gameCache[game.ID] = game
+	game.Questions[0].ID = game.ID
+	err := components.Dashboard(navBar, components.Game(game.Questions[0])).Render(request.Context(), w)
 	if err != nil {
 		slog.Error("problem rendering", "error", err)
 	}
 }
 
 func (s *handler) gameWord(w http.ResponseWriter, request *http.Request) {
-	question := s.gameCache[request.PathValue("id")]
+	game := s.gameCache[request.PathValue("id")]
 	selected := request.FormValue("selected")
 
 	var next, retry bool
 	var options []core.Option
+	question := game.LatestQuestion()
 	for _, v := range question.Options {
 		var opt core.Option
 		opt.Text = v.Text
-		if v.Text == selected && v.Text == question.Word {
+		if v.Text == selected && v.Text == question.CorrectOption {
 			opt.Status = 1
 			next = true
-		} else if v.Text == selected && v.Text != question.Word {
+		} else if v.Text == selected && v.Text != question.CorrectOption {
 			opt.Status = 2
 			retry = true
-		} else if v.Text != selected && v.Text == question.Word {
+		} else if v.Text != selected && v.Text == question.CorrectOption {
 			opt.Status = 3
 		}
 		options = append(options, opt)
@@ -359,18 +354,10 @@ func (s *handler) gameWord(w http.ResponseWriter, request *http.Request) {
 }
 
 func (s *handler) nextGameWord(w http.ResponseWriter, request *http.Request) {
-	question := s.gameCache[request.PathValue("id")]
-	question = core.Question{
-		ID:   "asadda",
-		Word: "Next",
-		Options: []core.Option{
-			{Text: "AA"},
-			{Text: "ED"},
-			{Text: "FD"},
-			{Text: "DD"},
-		},
-	}
-	s.gameCache[question.ID] = question
+	game := s.gameCache[request.PathValue("id")]
+	question := s.GameService.NextQuestion()
+	game.Questions = append(game.Questions, question)
+	s.gameCache[question.ID] = game
 	err := components.Dashboard(components.NavBar(nav("Game")), components.Game(question)).Render(request.Context(), w)
 	if err != nil {
 		slog.Error("problem rendering", "error", err)

@@ -120,6 +120,42 @@ func (m MongoStore) FindBy(search core.Search) ([]*core.Word, error) {
 	}
 	return words, nil
 }
+
+// TODO Almost the same as FindBy, decide which one to keep
+func (m MongoStore) SearchBy(search core.Search) ([]*core.Word, error) {
+	if search.Limit == 0 {
+		search.Limit = 20
+	}
+	sample := bson.D{{Key: "$sample", Value: bson.D{
+		{Key: "size", Value: search.Limit},
+	}}}
+	var s = bson.A{}
+	if search.Tag != nil {
+		s = append(s, bson.D{{Key: "$match", Value: bson.D{{Key: "tags", Value: *search.Tag}}}})
+	}
+	s = append(s, sample)
+	ctx := context.TODO()
+	c, err := m.dutchCollection().Aggregate(ctx, s)
+	if err != nil {
+		return nil, err
+	}
+	defer func(c *mongo.Cursor, ctx context.Context) {
+		err := c.Close(ctx)
+		if err != nil {
+			// TODO handle error
+		}
+	}(c, ctx)
+
+	var words []*core.Word
+	for c.Next(context.TODO()) {
+		var w Word
+		if err := c.Decode(&w); err != nil {
+			return nil, err
+		}
+		words = append(words, w.toEntity())
+	}
+	return words, nil
+}
 func (m MongoStore) dutchCollection() *mongo.Collection {
 	return m.client.Database("dutch").Collection("words")
 }
