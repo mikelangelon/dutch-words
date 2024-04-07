@@ -315,8 +315,7 @@ func (s *handler) game(w http.ResponseWriter, request *http.Request) {
 	navBar := components.NavBar(nav("Game"))
 	game := s.GameService.NewGame()
 	s.gameCache[game.ID] = game
-	game.Questions[0].ID = game.ID
-	err := components.Dashboard(navBar, components.Game(game.Questions[0])).Render(request.Context(), w)
+	err := components.Dashboard(navBar, components.Game(game)).Render(request.Context(), w)
 	if err != nil {
 		slog.Error("problem rendering", "error", err)
 	}
@@ -334,6 +333,7 @@ func (s *handler) gameWord(w http.ResponseWriter, request *http.Request) {
 		opt.Text = v.Text
 		if v.Text == selected && v.Text == question.CorrectOption {
 			opt.Status = 1
+			game.CurrentPoints += question.QuestionPoints
 			next = true
 		} else if v.Text == selected && v.Text != question.CorrectOption {
 			opt.Status = 2
@@ -345,9 +345,10 @@ func (s *handler) gameWord(w http.ResponseWriter, request *http.Request) {
 	}
 
 	question.Options = options
-	question.Next = next
-	question.Retry = retry
-	err := components.Game(question).Render(request.Context(), w)
+	game.Next = next
+	game.Retry = retry
+	s.gameCache[request.PathValue("id")] = game
+	err := components.Game(game).Render(request.Context(), w)
 	if err != nil {
 		slog.Error("problem rendering", "error", err)
 	}
@@ -357,8 +358,10 @@ func (s *handler) nextGameWord(w http.ResponseWriter, request *http.Request) {
 	game := s.gameCache[request.PathValue("id")]
 	question := s.GameService.NextQuestion()
 	game.Questions = append(game.Questions, question)
-	s.gameCache[question.ID] = game
-	err := components.Dashboard(components.NavBar(nav("Game")), components.Game(question)).Render(request.Context(), w)
+	game.Next = false
+	game.Retry = false
+	s.gameCache[game.ID] = game
+	err := components.Dashboard(components.NavBar(nav("Game")), components.Game(game)).Render(request.Context(), w)
 	if err != nil {
 		slog.Error("problem rendering", "error", err)
 	}

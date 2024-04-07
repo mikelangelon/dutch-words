@@ -19,22 +19,26 @@ func vals(word, selected string) string {
     return fmt.Sprintf(`{"word": "%s", "selected":"%s"}`, word, selected)
 }
 
-templ Game(question core.Question) {
+templ Game(game core.Game) {
 
     <div class="container-md d-grid gap-2" id="questions" hx-target="#questions" hx-swap="outerHTML">
-        <div class="py-5">
-            {question.Word}
+        <div class="alert alert-warning" role="alert">
+            Current Points: {fmt.Sprintf("%d",game.CurrentPoints)}
         </div>
-    for _, v := range question.Options {
+        <div class="py-2">
+        Word for {fmt.Sprintf("%d",game.LatestQuestion().QuestionPoints)} points:
+            <b>{game.LatestQuestion().Word}</b>
+        </div>
+    for _, v := range game.LatestQuestion().Options {
          <button class={buttonStyle(v.Status)}
-           hx-post={"/game/word/"+question.ID} hx-vals={vals(question.Word, v.Text)} type="button">{v.Text}</button>
+           hx-post={"/game/word/"+game.ID} hx-vals={vals(game.LatestQuestion().Word, v.Text)} type="button">{v.Text}</button>
     }
     </div>
     <div class="container-md mt-3 gap-2">
-    if question.Next {
-        <button class="btn btn-primary" hx-get={"/game/word/"+question.ID} type="button" hx-target="body" hx-swap="innerHTML">Next</button>
+    if game.Next {
+        <button class="btn btn-primary" hx-get={"/game/word/"+game.ID} type="button" hx-target="body" hx-swap="innerHTML">Next</button>
     }
-    if question.Retry {
+    if game.Retry {
         <button class="btn btn-primary" hx-get={"/game"} type="button" hx-target="body" hx-swap="innerHTML">Retry</button>
     }
     </div>

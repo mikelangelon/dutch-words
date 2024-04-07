@@ -50,9 +50,9 @@ func ToQuestion(words []core.Word) core.Question {
 	}
 	core.ShuffleOption(options)
 	return core.Question{
-		ID:            "A",
-		Word:          words[0].English,
-		CorrectOption: words[0].Dutch,
-		Options:       options,
+		Word:           words[0].English,
+		CorrectOption:  words[0].Dutch,
+		Options:        options,
+		QuestionPoints: 1,
 	}
 }
