@@ -1,0 +1,41 @@
+package components
+
+import "github.com/mikelangelon/dutch-words/core"
+import "fmt"
+
+func buttonStyle(status int64) string {
+    switch status{
+        case 1:
+            return "btn btn-success"
+        case 2:
+            return "btn btn-danger"
+        case 3:
+            return "btn btn-warning"
+    }
+    return "btn btn-primary"
+}
+
+func vals(word, selected string) string {
+    return fmt.Sprintf(`{"word": "%s", "selected":"%s"}`, word, selected)
+}
+
+templ Game(question core.Question) {
+
+    <div class="container-md d-grid gap-2" id="questions" hx-target="#questions" hx-swap="outerHTML">
+        <div class="py-5">
+            {question.Word}
+        </div>
+    for _, v := range question.Options {
+         <button class={buttonStyle(v.Status)}
+           hx-post={"/game/word/"+question.ID} hx-vals={vals(question.Word, v.Text)} type="button">{v.Text}</button>
+    }
+    </div>
+    <div class="container-md mt-3 gap-2">
+    if question.Next {
+        <button class="btn btn-primary" hx-get={"/game/word/"+question.ID} type="button" hx-target="body" hx-swap="innerHTML">Next</button>
+    }
+    if question.Retry {
+        <button class="btn btn-primary" hx-get={"/game"} type="button" hx-target="body" hx-swap="innerHTML">Retry</button>
+    }
+    </div>
+}
