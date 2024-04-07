@@ -3,12 +3,10 @@ package core
 import "math/rand"
 
 type Question struct {
-	ID            string
-	Word          string
-	CorrectOption string
-	Options       []Option
-	Next          bool
-	Retry         bool
+	QuestionPoints int64
+	Word           string
+	CorrectOption  string
+	Options        []Option
 }
 
 type Option struct {
