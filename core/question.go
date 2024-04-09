@@ -4,6 +4,7 @@ import "math/rand"
 
 type Question struct {
 	QuestionPoints int64
+	WordID         string
 	Word           string
 	CorrectOption  string
 	Options        []Option
