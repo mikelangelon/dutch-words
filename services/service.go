@@ -16,7 +16,6 @@ type store interface {
 	Insert(word *core.Word) error
 	Update(word *core.Word) error
 	FindBy(search core.Search) ([]*core.Word, error)
-	SearchBy(search core.Search) ([]*core.Word, error)
 	Delete(id string) error
 	GetAllTags() ([]string, error)
 }

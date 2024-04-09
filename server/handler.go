@@ -347,6 +347,7 @@ func (s *handler) gameWord(w http.ResponseWriter, request *http.Request) {
 	question.Options = options
 	game.Next = next
 	game.Retry = retry
+	s.answer(question.WordID, next)
 	s.gameCache[request.PathValue("id")] = game
 	err := components.Game(game).Render(request.Context(), w)
 	if err != nil {
@@ -354,6 +355,15 @@ func (s *handler) gameWord(w http.ResponseWriter, request *http.Request) {
 	}
 }
 
+func (s *handler) answer(wordID string, correct bool) {
+	if err := s.GameService.Answer(core.Answer{
+		WordID:  wordID,
+		UserID:  "1",
+		Correct: correct,
+	}); err != nil {
+		slog.Error("unexpected error answering word", "error", err)
+	}
+}
 func (s *handler) nextGameWord(w http.ResponseWriter, request *http.Request) {
 	game := s.gameCache[request.PathValue("id")]
 	question := s.GameService.NextQuestion()

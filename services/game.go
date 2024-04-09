@@ -7,10 +7,15 @@ import (
 )
 
 type GameService struct {
-	store store
+	store gameStore
 }
 
-func NewGameService(store store) GameService {
+type gameStore interface {
+	SearchBy(search core.Search) ([]*core.Word, error)
+	UpsertAnswer(a core.Answer) error
+}
+
+func NewGameService(store gameStore) GameService {
 	return GameService{store: store}
 }
 
@@ -27,6 +32,10 @@ func (g GameService) NextQuestion() core.Question {
 	words, _ := g.loadPairsForTag(nil)
 	return ToQuestion(words)
 }
+
+func (g GameService) Answer(answer core.Answer) error {
+	return g.store.UpsertAnswer(answer)
+}
 func (g GameService) loadPairsForTag(tag *string) ([]core.Word, string) {
 	slog.Info("requesting for tag", "tag", tag)
 	words, err := g.store.SearchBy(core.Search{Tag: tag})
@@ -36,7 +45,7 @@ func (g GameService) loadPairsForTag(tag *string) ([]core.Word, string) {
 	}
 	w := make([]core.Word, len(words))
 	for i, v := range words {
-		w[i] = core.Word{Dutch: v.Dutch, English: v.English}
+		w[i] = core.Word{ID: v.ID, Dutch: v.Dutch, English: v.English}
 	}
 	return w, ""
 }
@@ -50,6 +59,7 @@ func ToQuestion(words []core.Word) core.Question {
 	}
 	core.ShuffleOption(options)
 	return core.Question{
+		WordID:         words[0].ID,
 		Word:           words[0].English,
 		CorrectOption:  words[0].Dutch,
 		Options:        options,
