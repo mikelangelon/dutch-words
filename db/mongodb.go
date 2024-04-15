@@ -33,6 +33,7 @@ type Word struct {
 	Difficulty *string  `bson:"difficulty,omitempty" json:"difficulty"`
 	Types      []string `bson:"types,omitempty" json:"types"`
 	Tags       []string `bson:"tags,omitempty" json:"tags"`
+	Article    *string  `bson:"article,omitempty" json:"article"`
 }
 
 func (w Word) toEntity() *core.Word {
@@ -42,6 +43,7 @@ func (w Word) toEntity() *core.Word {
 		English: w.English,
 		Types:   w.Types,
 		Tags:    w.Tags,
+		Article: w.Article,
 	}
 }
 
@@ -52,6 +54,7 @@ func wordToDB(w *core.Word) Word {
 		English: w.English,
 		Types:   w.Types,
 		Tags:    w.Tags,
+		Article: w.Article,
 	}
 }
 func (m MongoStore) Insert(word *core.Word) error {

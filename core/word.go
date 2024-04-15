@@ -11,6 +11,7 @@ type Word struct {
 	Dutch   string
 	English string
 	Types   []string
+	Article *string
 	Tags    []string
 }
 
