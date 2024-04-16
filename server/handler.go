@@ -6,6 +6,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"slices"
 	"strings"
 
 	"github.com/a-h/templ"
@@ -177,6 +178,7 @@ func (s *handler) putWord(w http.ResponseWriter, req *http.Request) {
 		English: english,
 		Types:   types,
 		Tags:    tags,
+		Article: article(types, req.FormValue("article")),
 	}
 	if err := s.Service.UpdateWord(word); err != nil {
 		data := core.NewFormData(nil, s.getTags())
@@ -375,4 +377,11 @@ func (s *handler) nextGameWord(w http.ResponseWriter, request *http.Request) {
 	if err != nil {
 		slog.Error("problem rendering", "error", err)
 	}
+}
+
+func article(types []string, article string) *string {
+	if !slices.Contains(types, "noun") {
+		return nil
+	}
+	return &article
 }

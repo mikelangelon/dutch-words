@@ -2,10 +2,27 @@ package components
 
 import (
     "github.com/mikelangelon/dutch-words/core"
+	"fmt"
 )
 
+
+
+func dehet(noun bool) string {
+    return fmt.Sprintf("{ dehet: %t }", noun)
+}
+
+func articleValueChecked(word *core.Word, radio string) bool {
+    if word == nil {
+        return false
+    }
+    if word.Article == nil {
+        return false
+    }
+    return *word.Article==radio
+}
+
 templ TypesField(data core.FormData) {
-  <div class="row mb-3">
+  <div class="row mb-3"  x-data={dehet(data.Word.HasType("noun"))}>
        <label for="inputType" class="col-sm-1 col-form-label">Types</label>
        for _, t := range []string{"noun", "verb", "adjective", "adverb"} {
             <div class="col-sm-1">
@@ -13,10 +30,32 @@ templ TypesField(data core.FormData) {
                     if data.Word.HasType(t){
                          checked
                      }
+                     if t == "noun" {
+                        x-on:click="dehet = ! dehet"
+                     }
                 />
                 <label for="scales">{t}</label>
             </div>
        }
+       <div class="row mb-3" x-show="dehet">
+            <label for="deHet" class="col-sm-1 col-form-label">De/Het</label>
+             <div class="col-sm-1">
+                 <input name="article" type="radio" value="de"
+                        if articleValueChecked(data.Word, "de") {
+                            checked
+                        }
+                 />
+                 <label for="de">De</label>
+             </div>
+             <div class="col-sm-1">
+                  <input name="article" type="radio" value="het"
+                      if articleValueChecked(data.Word, "het") {
+                          checked
+                      }
+                  />
+                  <label for="het">Het</label>
+             </div>
+         </div>
   </div>
 
 }
