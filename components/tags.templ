@@ -1,10 +1,15 @@
 package components
 
-templ Tags(tags []string) {
+import (
+    "github.com/mikelangelon/dutch-words/core"
+    "fmt"
+)
+
+templ Tags(tags []core.CountTag) {
     <div id="container-form" class="container-fluid bg-light d-grid gap-3 p-3 border border-secondary">
         <ul>
             for _, t := range tags {
-                <li><a href="#" hx-get={"/web/tags/" + t } hx-target="#search-results" >{ t }</a></li>
+                <li><a href="#" hx-get={"/web/tags/" + t.Tag } hx-target="#search-results" >{ t.Tag + "(" + fmt.Sprintf("%d", t.Count) + ")"}</a></li>
             }
         </ul>
     </div>

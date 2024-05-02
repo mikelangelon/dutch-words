@@ -84,11 +84,12 @@ func (m MongoStore) Delete(id string) error {
 	return nil
 }
 
-func (m MongoStore) GetAllTags() ([]string, error) {
-	//	db.contest.aggregate([
-	//	{"$group" : {_id:"$province", count:{$sum:1}}}
-	//])
-	// create group stage
+type countResults struct {
+	Tag   string `bson:"_id"`
+	Count int    `bson:"count"`
+}
+
+func (m MongoStore) GetAllTags() (core.Tags, error) {
 
 	groupStage := bson.D{
 		{"$group", bson.D{
@@ -97,29 +98,22 @@ func (m MongoStore) GetAllTags() ([]string, error) {
 		}}}
 
 	cursor, err := m.dutchCollection().Aggregate(context.TODO(), mongo.Pipeline{bson.D{{"$unwind", "$tags"}}, groupStage})
-	//results, err := m.dutchCollection().Distinct(context.TODO(), "tags", bson.M{})
 	if err != nil {
 		return nil, err
 	}
 
 	// display the results
-	var results []bson.M
+	var results []countResults
 	if err = cursor.All(context.TODO(), &results); err != nil {
 		panic(err)
 	}
-	for _, result := range results {
-		fmt.Printf("Average price of %v tea options: %v \n", result["_id"], result["count"])
+	var count []core.CountTag
+	for _, r := range results {
+		count = append(count, core.CountTag{Tag: r.Tag, Count: r.Count})
 	}
-	return []string{}, nil
-	//var tags []string
-	//for _, v := range results {
-	//	if v == nil || len(v.(string)) == 0 {
-	//		continue
-	//	}
-	//	tags = append(tags, v.(string))
-	//}
-	//return tags, nil
+	return count, nil
 }
+
 func (m MongoStore) FindBy(search core.Search) ([]*core.Word, error) {
 	var filter bson.M
 	if search.Tag != nil {

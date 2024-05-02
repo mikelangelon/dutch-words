@@ -17,7 +17,7 @@ type store interface {
 	Update(word *core.Word) error
 	FindBy(search core.Search) ([]*core.Word, error)
 	Delete(id string) error
-	GetAllTags() ([]string, error)
+	GetAllTags() (core.Tags, error)
 }
 
 func (s Service) InsertWord(word *core.Word) error {
@@ -48,6 +48,6 @@ func (s Service) FindWordsBy(search core.Search) ([]*core.Word, error) {
 	return s.store.FindBy(search)
 }
 
-func (s Service) FindAllTags() ([]string, error) {
+func (s Service) FindAllTags() (core.Tags, error) {
 	return s.store.GetAllTags()
 }

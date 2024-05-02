@@ -79,12 +79,12 @@ func (s *handler) newTags(w http.ResponseWriter, request *http.Request) {
 	}
 }
 func (s *handler) getTags() []string {
-	t, err := s.Service.FindAllTags()
+	tags, err := s.Service.FindAllTags()
 	if err != nil {
 		// TODO Deal with tags issue. Maybe skip it?
 		slog.Error("problem getting tags", "error", err)
 	}
-	return t
+	return tags.Tags()
 }
 
 func nav(current string) core.NavigationItems {
