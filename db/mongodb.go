@@ -84,20 +84,36 @@ func (m MongoStore) Delete(id string) error {
 	return nil
 }
 
-func (m MongoStore) GetAllTags() ([]string, error) {
-	results, err := m.dutchCollection().Distinct(context.TODO(), "tags", bson.M{})
+type countResults struct {
+	Tag   string `bson:"_id"`
+	Count int    `bson:"count"`
+}
+
+func (m MongoStore) GetAllTags() (core.Tags, error) {
+
+	groupStage := bson.D{
+		{"$group", bson.D{
+			{"_id", "$tags"},
+			{"count", bson.D{{"$sum", 1}}},
+		}}}
+
+	cursor, err := m.dutchCollection().Aggregate(context.TODO(), mongo.Pipeline{bson.D{{"$unwind", "$tags"}}, groupStage})
 	if err != nil {
 		return nil, err
 	}
-	var tags []string
-	for _, v := range results {
-		if v == nil || len(v.(string)) == 0 {
-			continue
-		}
-		tags = append(tags, v.(string))
+
+	// display the results
+	var results []countResults
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		panic(err)
 	}
-	return tags, nil
+	var count []core.CountTag
+	for _, r := range results {
+		count = append(count, core.CountTag{Tag: r.Tag, Count: r.Count})
+	}
+	return count, nil
 }
+
 func (m MongoStore) FindBy(search core.Search) ([]*core.Word, error) {
 	var filter bson.M
 	if search.Tag != nil {
