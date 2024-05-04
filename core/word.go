@@ -26,6 +26,9 @@ func NewWord(dutch, english string, wordType, tags []string) Word {
 }
 
 func (w *Word) HasTag(tag string) bool {
+	if w == nil {
+		return false
+	}
 	return w.has(tag, w.Tags)
 }
 

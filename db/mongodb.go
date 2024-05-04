@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson/primitive"
+
 	"github.com/mikelangelon/dutch-words/config"
 	"github.com/mikelangelon/dutch-words/core"
 	"go.mongodb.org/mongo-driver/bson"
@@ -92,12 +94,12 @@ type countResults struct {
 func (m MongoStore) GetAllTags() (core.Tags, error) {
 
 	groupStage := bson.D{
-		{"$group", bson.D{
-			{"_id", "$tags"},
-			{"count", bson.D{{"$sum", 1}}},
+		{Key: "$group", Value: bson.D{
+			{Key: "_id", Value: "$tags"},
+			{Key: "count", Value: bson.D{{Key: "$sum", Value: 1}}},
 		}}}
 
-	cursor, err := m.dutchCollection().Aggregate(context.TODO(), mongo.Pipeline{bson.D{{"$unwind", "$tags"}}, groupStage})
+	cursor, err := m.dutchCollection().Aggregate(context.TODO(), mongo.Pipeline{bson.D{{Key: "$unwind", Value: "$tags"}}, groupStage})
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +125,11 @@ func (m MongoStore) FindBy(search core.Search) ([]*core.Word, error) {
 	} else if search.EnglishWord != nil {
 		filter = bson.M{"english": bson.D{{Key: "$regex", Value: fmt.Sprintf("^%s", *search.EnglishWord)}}}
 	} else if search.ID != nil {
-		filter = bson.M{"_id": *search.ID}
+		id, err := primitive.ObjectIDFromHex(*search.ID)
+		if err != nil {
+			return nil, err
+		}
+		filter = bson.M{"_id": id}
 	}
 
 	c, err := m.dutchCollection().Find(context.TODO(), filter)
