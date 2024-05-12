@@ -20,6 +20,7 @@ func New(service services.Service, ss services.SentencesService, gs services.Gam
 	mux.HandleFunc("GET /game", handler.game)
 	mux.HandleFunc("POST /game/word/{id}", handler.gameWord)
 	mux.HandleFunc("GET /game/word/{id}", handler.nextGameWord)
+	mux.HandleFunc("GET /game/scores", handler.showScores)
 	// Routing
 	mux.HandleFunc("GET /", handler.formAndList)
 	mux.HandleFunc("GET /web/", handler.formAndList)

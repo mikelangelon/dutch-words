@@ -109,6 +109,10 @@ func nav(current string) core.NavigationItems {
 			Label: "Game",
 			Link:  "/game",
 		},
+		{
+			Label: "Scores",
+			Link:  "/game/scores",
+		},
 	}
 	for _, v := range items {
 		if v.Label == current {
@@ -376,6 +380,16 @@ func (s *handler) nextGameWord(w http.ResponseWriter, request *http.Request) {
 	err := components.Dashboard(components.NavBar(nav("Game")), components.Game(game)).Render(request.Context(), w)
 	if err != nil {
 		slog.Error("problem rendering", "error", err)
+	}
+}
+
+func (s *handler) showScores(w http.ResponseWriter, request *http.Request) {
+	enableCors(&w)
+
+	navBar := components.NavBar(nav("Scores"))
+	err := components.Dashboard(navBar, templ.NopComponent).Render(request.Context(), w)
+	if err != nil {
+		slog.Error("problem rendering scores", "error", err)
 	}
 }
 
