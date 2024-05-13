@@ -19,3 +19,9 @@ lint.install:
 lint.run:
 	golangci-lint run -c .golangci.yml -v --fix
 
+dev.start:
+	docker-compose up -d
+
+dev.down:
+	docker-compose down
+
