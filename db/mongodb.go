@@ -92,12 +92,12 @@ type countResults struct {
 func (m MongoStore) GetAllTags() (core.Tags, error) {
 
 	groupStage := bson.D{
-		{"$group", bson.D{
-			{"_id", "$tags"},
-			{"count", bson.D{{"$sum", 1}}},
+		{Key: "$group", Value: bson.D{
+			{Key: "_id", Value: "$tags"},
+			{Key: "count", Value: bson.D{{Key: "$sum", Value: 1}}},
 		}}}
 
-	cursor, err := m.dutchCollection().Aggregate(context.TODO(), mongo.Pipeline{bson.D{{"$unwind", "$tags"}}, groupStage})
+	cursor, err := m.dutchCollection().Aggregate(context.TODO(), mongo.Pipeline{bson.D{{Key: "$unwind", Value: "$tags"}}, groupStage})
 	if err != nil {
 		return nil, err
 	}

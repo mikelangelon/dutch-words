@@ -3,15 +3,13 @@ package db
 import (
 	"context"
 	"fmt"
+
 	"github.com/mikelangelon/dutch-words/core"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
-
-type answerDTO struct {
-}
 
 func (m MongoStore) answersCollection() *mongo.Collection {
 	return m.client.Database("dutch").Collection("answer")
@@ -34,14 +32,6 @@ func (m MongoStore) UpsertAnswer(a core.Answer) error {
 }
 
 func (m MongoStore) GetAnswers() ([]core.Answer, error) {
-	findOptions := options.Find()
-	// Sort by `price` field descending
-	findOptions.SetSort(bson.D{{"amountWrong", -1}})
-	//cursor, err := m.answersCollection().Find(context.TODO(), bson.M{"amountCorrect": bson.M{"$gt": 0}}, findOptions)
-	//if err != nil {
-	//	return nil, err
-	//}
-
 	pipeline := []bson.M{
 		bson.M{"$lookup": bson.M{"from": "words", "localField": "wordId", "foreignField": "_id", "as": "words"}},
 		{"$set": bson.M{"word": bson.M{"$arrayElemAt": bson.A{"$words", 0}}}},
@@ -56,10 +46,6 @@ func (m MongoStore) GetAnswers() ([]core.Answer, error) {
 	if err = cursor.All(context.TODO(), &answers); err != nil {
 		panic(err)
 	}
-	//var answers []Answer
-	//if err = cursor.All(context.TODO(), &answers); err != nil {
-	//	panic(err)
-	//}
 	return answers, nil
 }
 
