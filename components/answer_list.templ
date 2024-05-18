@@ -1,0 +1,27 @@
+package components
+
+import (
+    "github.com/mikelangelon/dutch-words/core"
+    "fmt"
+)
+
+templ AnswerList(answers []core.Answer) {
+	<div id="answer">
+	<table>
+	<tr>
+                <th>Word</th>
+                <th>Amount correct</th>
+                <th>Amount wrong</th>
+              </tr>
+	for _, a := range answers {
+          <tr>
+            <td>{a.Word.Dutch}</td>
+            <td>{fmt.Sprintf("%d", a.AmountCorrect)}</td>
+            <td>{fmt.Sprintf("%d", a.AmountWrong)}</td>
+          </tr>
+      }
+    </table>
+
+
+	</div>
+}

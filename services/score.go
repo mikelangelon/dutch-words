@@ -12,3 +12,7 @@ type ScoreService struct {
 func NewScoreService(store scoreStore) ScoreService {
 	return ScoreService{store: store}
 }
+
+func (s ScoreService) GetScores() ([]core.Answer, error) {
+	return s.store.GetAnswers()
+}

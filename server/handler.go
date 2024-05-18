@@ -20,14 +20,16 @@ type handler struct {
 	Service          services.Service
 	SentencesService services.SentencesService
 	GameService      services.GameService
+	ScoreService     services.ScoreService
 	gameCache        map[string]core.Game
 }
 
-func newHandler(service services.Service, sentencesService services.SentencesService, gameService services.GameService) *handler {
+func newHandler(service services.Service, sentencesService services.SentencesService, gameService services.GameService, scoreService services.ScoreService) *handler {
 	return &handler{
 		Service:          service,
 		SentencesService: sentencesService,
 		GameService:      gameService,
+		ScoreService:     scoreService,
 		gameCache:        make(map[string]core.Game),
 	}
 }
@@ -386,8 +388,12 @@ func (s *handler) nextGameWord(w http.ResponseWriter, request *http.Request) {
 func (s *handler) showScores(w http.ResponseWriter, request *http.Request) {
 	enableCors(&w)
 
+	answers, err := s.ScoreService.GetScores()
+	if err != nil {
+		slog.Error("problem rendering", "error", err)
+	}
 	navBar := components.NavBar(nav("Scores"))
-	err := components.Dashboard(navBar, templ.NopComponent).Render(request.Context(), w)
+	err = components.Dashboard(navBar, components.AnswerList(answers)).Render(request.Context(), w)
 	if err != nil {
 		slog.Error("problem rendering scores", "error", err)
 	}
