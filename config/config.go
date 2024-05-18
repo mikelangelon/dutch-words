@@ -8,7 +8,7 @@ type Config struct {
 
 func Parse() (c *Config, err error) {
 	return &Config{
-		MongoURL: getEnvWithFallback("MONGO_URL", "mongodb://localhost:27017/"),
+		MongoURL: getEnvWithFallback("MONGO_URL", "mongodb+srv://monoadmin:qs48zkUTcHWmbaiA@cluster0.0rmqvms.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"),
 	}, nil
 }
 

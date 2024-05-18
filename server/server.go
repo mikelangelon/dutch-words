@@ -13,13 +13,14 @@ import (
 	"github.com/mikelangelon/dutch-words/services"
 )
 
-func New(service services.Service, ss services.SentencesService, gs services.GameService) *http.Server {
-	handler := newHandler(service, ss, gs)
+func New(service services.Service, ss services.SentencesService, gs services.GameService, sc services.ScoreService) *http.Server {
+	handler := newHandler(service, ss, gs, sc)
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /game", handler.game)
 	mux.HandleFunc("POST /game/word/{id}", handler.gameWord)
 	mux.HandleFunc("GET /game/word/{id}", handler.nextGameWord)
+	mux.HandleFunc("GET /game/scores", handler.showScores)
 	// Routing
 	mux.HandleFunc("GET /", handler.formAndList)
 	mux.HandleFunc("GET /web/", handler.formAndList)
