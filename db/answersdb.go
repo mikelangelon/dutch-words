@@ -48,35 +48,3 @@ func (m MongoStore) GetAnswers() ([]core.Answer, error) {
 	}
 	return answers, nil
 }
-
-//func (m MongoStore) GetAnswers() ([]core.Answer, error) {
-//	findOptions := options.Find()
-//	findOptions.SetSort(bson.D{{"amountCorrect", -1}})
-//	cursor, err := m.answersCollection().Find(context.TODO(), bson.M{"amountCorrect": bson.M{"$gt": 0}}, findOptions)
-//	if err != nil {
-//		return nil, err
-//	}
-//	defer cursor.Close(context.TODO())
-//	var answers []Answer
-//	if err = cursor.All(context.TODO(), &answers); err != nil {
-//		panic(err)
-//	}
-//
-//	var result []core.Answer
-//	for _, v := range answers {
-//		words, err := m.FindBy(core.Search{ID: &v.UserID})
-//		if err != nil {
-//			continue
-//		}
-//		if len(words) == 0 {
-//			continue
-//		}
-//		result = append(result, core.Answer{
-//			WordID:  "",
-//			Correct: false,
-//			Word:    words[0].Dutch,
-//		})
-//
-//	}
-//	return result, nil
-//}
